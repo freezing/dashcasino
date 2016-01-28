@@ -7,7 +7,7 @@
 #
 # Host: 33.33.33.10 (MySQL 5.5.47-0ubuntu0.12.04.1)
 # Database: dashcasino
-# Generation Time: 2016-01-28 21:48:50 +0000
+# Generation Time: 2016-01-28 23:13:00 +0000
 # ************************************************************
 
 
@@ -47,8 +47,9 @@ CREATE TABLE `BlackjackCard` (
   `Code` int(11) unsigned NOT NULL,
   `RankCode` int(11) unsigned NOT NULL,
   `RankName` varchar(20) NOT NULL,
-  `RankLetter` char(1) NOT NULL,
+  `RankLetter` varchar(5) NOT NULL DEFAULT '',
   `SuitName` int(11) unsigned NOT NULL,
+  `SuitLetter` varchar(5) NOT NULL DEFAULT '',
   `SuitCode` int(11) unsigned NOT NULL,
   `PrimaryValue` int(11) unsigned NOT NULL,
   `SecondaryValue` int(11) unsigned DEFAULT NULL,
@@ -96,10 +97,10 @@ CREATE TABLE `BlackjackGameState` (
   KEY `fk_blackjackgame` (`GameId`),
   KEY `fk_lastcommand` (`LastCommandId`),
   KEY `fk_statuscode` (`StatusCodeId`),
+  CONSTRAINT `fk_blackjackgame` FOREIGN KEY (`GameId`) REFERENCES `BlackjackGame` (`Id`),
   CONSTRAINT `fk_lastcommand` FOREIGN KEY (`LastCommandId`) REFERENCES `Command` (`Id`),
   CONSTRAINT `fk_statuscode` FOREIGN KEY (`StatusCodeId`) REFERENCES `StatusCode` (`Id`),
-  CONSTRAINT `fk_user` FOREIGN KEY (`UserId`) REFERENCES `User` (`Id`),
-  CONSTRAINT `fk_blackjackgame` FOREIGN KEY (`GameId`) REFERENCES `BlackjackGame` (`Id`)
+  CONSTRAINT `fk_user` FOREIGN KEY (`UserId`) REFERENCES `User` (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -183,6 +184,16 @@ CREATE TABLE `User` (
   UNIQUE KEY `Email` (`Email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+LOCK TABLES `User` WRITE;
+/*!40000 ALTER TABLE `User` DISABLE KEYS */;
+
+INSERT INTO `User` (`Id`, `Email`, `PasswordHash`, `Timestamp`)
+VALUES
+	(25,'asd@gmail.com','passwordhash','2016-01-28 22:07:46'),
+	(27,'aasd@gmail.com','passwordhash','2016-01-28 22:08:22');
+
+/*!40000 ALTER TABLE `User` ENABLE KEYS */;
+UNLOCK TABLES;
 
 
 

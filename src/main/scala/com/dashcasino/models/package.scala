@@ -17,8 +17,10 @@ package object models {
   // This card is user only for the blackjack game since it has all the required info for the game
   // Value represents card value in the blackjack game
   // NOTE: Primary and Secondary values are for the Ace
-  case class BlackjackCard(id: Int, code: Int, rankCode: Int, rankName: String, rankLetter: Char, suitName: String, suitCode: Int, primaryValue: Int, secondaryValue: Int)
+  case class BlackjackCard(id: Int, code: Int, rankCode: Int, rankName: String, rankLetter: String, suitName: String, suitLetter: String, suitCode: Int, primaryValue: Int, secondaryValue: Int)
 
+  // These two are not connected to any tables. They will just represent UserHand and DealerHand in a nice
+  // Case class format using agronaut, and convert hands to JSON ready string for SQL
   case class BlackjackHand(hand: List[BlackjackCard])
   case class BlackjackHands(hands: List[BlackjackHand])
 }
