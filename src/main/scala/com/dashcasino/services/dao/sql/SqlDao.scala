@@ -6,7 +6,7 @@ import scalikejdbc.{AutoSession, ConnectionPool, GlobalSettings, LoggingSQLAndTi
   * Created by freezing on 1/28/16.
   */
 // TODO: Read credentials from config file and enable LIVE and TEST modes
-trait SqlDao extends UserSqlDao with AccountSqlDao {
+trait SqlDao extends UserSqlDao with AccountSqlDao with BlackjackGameDao {
   // initialize JDBC driver & connection pool
   Class.forName("com.mysql.jdbc.Driver")
   ConnectionPool.singleton("jdbc:mysql://33.33.33.10:3306/dashcasino", "root", "root")

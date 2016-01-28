@@ -12,7 +12,5 @@ trait AccountSqlDao { self: SqlDao =>
 
   def insertAccount(account: Account) = sql"INSERT INTO Account (UserId, DepositAddress, Amount) VALUES (${account.userId}, ${account.depositAddress}, ${account.amount})".update().apply()
 
-  def findUser(email: String): Option[Account] = sql"SELECT * FROM User WHERE email=$email".map(toAccount).single().apply()
-
   def findAccount(userId: Int): Option[Account] = sql"SELECT * FROM User WHERE UserId=$userId".map(toAccount).single().apply()
 }
