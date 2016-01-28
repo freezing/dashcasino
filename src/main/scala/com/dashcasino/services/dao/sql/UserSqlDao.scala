@@ -15,5 +15,4 @@ trait UserSqlDao { self: SqlDao =>
   def findUser(email: String): Option[User] = sql"SELECT * FROM User WHERE email=$email".map(toUser).single().apply()
 
   def findUser(id: Int): Option[User] = sql"SELECT * FROM User WHERE id=$id".map(toUser).single().apply()
-  }
 }
