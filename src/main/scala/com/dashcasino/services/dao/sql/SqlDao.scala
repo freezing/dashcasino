@@ -1,7 +1,6 @@
-package com.dashcasino.services.dao
+package com.dashcasino.services.dao.sql
 
-import com.dashcasino.services.dao.sql.UserSqlDao
-import scalikejdbc.{LoggingSQLAndTimeSettings, GlobalSettings, AutoSession, ConnectionPool}
+import scalikejdbc.{AutoSession, ConnectionPool, GlobalSettings, LoggingSQLAndTimeSettings}
 
 /**
   * Created by freezing on 1/28/16.
