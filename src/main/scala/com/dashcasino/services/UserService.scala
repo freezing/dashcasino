@@ -1,5 +1,6 @@
+package com.dashcasino.services
+
 import scalikejdbc._
-import scalaz._
 
 /**
   * Created by freezing on 1/27/16.
@@ -15,6 +16,6 @@ object UserService extends App {
 
   val rawValue = "THis is a raw transaction"
 
-  
+
   sql"INSERT INTO RawTransaction (RowValue) VALUES ($rawValue)".update().apply()
 }
