@@ -7,7 +7,7 @@
 #
 # Host: 33.33.33.10 (MySQL 5.5.47-0ubuntu0.12.04.1)
 # Database: dashcasino
-# Generation Time: 2016-01-28 21:03:31 +0000
+# Generation Time: 2016-01-28 21:40:50 +0000
 # ************************************************************
 
 
@@ -176,7 +176,7 @@ DROP TABLE IF EXISTS `User`;
 
 CREATE TABLE `User` (
   `Id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `Email` varchar(11) NOT NULL DEFAULT '',
+  `Email` varchar(60) NOT NULL DEFAULT '',
   `PasswordHash` varchar(20) NOT NULL DEFAULT '',
   `Timestamp` datetime NOT NULL,
   PRIMARY KEY (`Id`)
