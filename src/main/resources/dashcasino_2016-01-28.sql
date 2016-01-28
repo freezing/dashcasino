@@ -7,7 +7,7 @@
 #
 # Host: 33.33.33.10 (MySQL 5.5.47-0ubuntu0.12.04.1)
 # Database: dashcasino
-# Generation Time: 2016-01-28 21:40:50 +0000
+# Generation Time: 2016-01-28 21:48:50 +0000
 # ************************************************************
 
 
@@ -179,7 +179,8 @@ CREATE TABLE `User` (
   `Email` varchar(60) NOT NULL DEFAULT '',
   `PasswordHash` varchar(20) NOT NULL DEFAULT '',
   `Timestamp` datetime NOT NULL,
-  PRIMARY KEY (`Id`)
+  PRIMARY KEY (`Id`),
+  UNIQUE KEY `Email` (`Email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
