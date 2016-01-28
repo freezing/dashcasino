@@ -1,6 +1,6 @@
 package com.dashcasino.services.dao.sql
 
-import com.dashcasino.models.{Command, Account}
+import com.dashcasino.models.Command
 
 import scalikejdbc._
 
@@ -12,7 +12,7 @@ trait CommandSqlDao { self: SqlDao =>
 
   def insertCommand(command: Command) = sql"INSERT INTO Command (Name) VALUES (${command.name})".update().apply()
 
-  def findCommand(id: Int): Option[Command] = sql"SELECT * FROM Command WHERE id=$id".map(toCommand).single().apply()
+  def findCommand(id: Int): Option[Command] = sql"SELECT * FROM Command WHERE Id=$id".map(toCommand).single().apply()
 
-  def findCommand(name: String): Option[Command] = sql"SELECT * FROM Command WHERE id=$name".map(toCommand).single().apply()
+  def findCommand(name: String): Option[Command] = sql"SELECT * FROM Command WHERE Name=$name".map(toCommand).single().apply()
 }
