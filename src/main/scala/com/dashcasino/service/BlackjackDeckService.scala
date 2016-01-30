@@ -3,8 +3,6 @@ package com.dashcasino.service
 import com.dashcasino.dao.sql.{BlackjackDeckSqlDao, BlackjackCardSqlDao}
 import com.dashcasino.model._
 
-import argonaut._, Argonaut._
-
 /**
   * Created by freezing on 1/30/16.
   */
@@ -39,16 +37,4 @@ class BlackjackDeckService(implicit val blackjackDeckDao: BlackjackDeckSqlDao, b
       case None => throw new Exception("Deck not found")
     }
   }
-
-  def getUserHandsAsJson(blackjackDeck: BlackjackDeck, gameStateOption: Option[BlackjackGameState]): JsonString =
-    getUserHands(blackjackDeck, gameStateOption).asJson.toString()
-
-  def getDealerHandAsJson(blackjackDeck: BlackjackDeck, gameStateOption: Option[BlackjackGameState]): JsonString =
-    getDealerHand(blackjackDeck, gameStateOption).asJson.toString()
-
-  def getUserHandsAsJson(blackjackDeckId: Int, gameStateOption: Option[BlackjackGameState]): JsonString =
-    getUserHands(blackjackDeckId, gameStateOption).asJson.toString()
-
-  def getDealerHandAsJson(blackjackDeckId: Int, gameStateOption: Option[BlackjackGameState]): JsonString =
-    getDealerHand(blackjackDeckId, gameStateOption).asJson.toString()
 }

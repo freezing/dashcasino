@@ -22,5 +22,7 @@ class BlackjackGameSqlDao(implicit val session: AutoSession.type) {
     }
   }
 
-  // No need for find yet
+  def findBlackjackGame(id: Int): Option[BlackjackGame] = {
+    sql"SELECT * FROM BlackjackGame WHERE Id=$id".map(toBlackjackGame).single().apply()
+  }
 }

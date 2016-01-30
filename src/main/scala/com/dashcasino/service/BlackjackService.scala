@@ -2,7 +2,9 @@ package com.dashcasino.service
 
 import com.dashcasino.dao.{DaoStatusCode, ResultCode}
 import com.dashcasino.dao.sql.{BlackjackGameSqlDao, BlackjackGameStateSqlDao}
-import com.dashcasino.model.{BlackjackDeck, BlackjackGameState, BlackjackGame}
+import com.dashcasino.model.{BlackjackHands, BlackjackDeck, BlackjackGameState, BlackjackGame}
+
+import argonaut._, Argonaut._
 
 /**
   * Created by freezing on 1/30/16.
@@ -13,8 +15,8 @@ class BlackjackService(implicit val blackjackGameDao: BlackjackGameSqlDao, black
       case Some(game) =>
         // Create initial state for the game
         // TODO: Figure out what is status code, it's not really well defined
-        val userHand = blackjackDeckService.getUserHandsAsJson(blackjackDeckId, None)
-        val dealerHand = blackjackDeckService.getDealerHandAsJson(blackjackDeckId, None)
+        val userHand = blackjackDeckService.getUserHands(blackjackDeckId, None).asJson.toString
+        val dealerHand = blackjackDeckService.getDealerHand(blackjackDeckId, None).asJson.toString
 
         val description = "Some description for initial state"
         val blackjackGameState = BlackjackGameState(-1, userId, game.id, userHand, dealerHand, description, commandService.BLACKJACK_BET, 0, -1)
@@ -25,11 +27,23 @@ class BlackjackService(implicit val blackjackGameDao: BlackjackGameSqlDao, black
     }
   }
 
-  def `user cards`(gameId: Int) = {
-
+  def `user cards`(gameId: Int): Option[BlackjackHands] = {
+    blackjackGameDao.findBlackjackGame(gameId) match {
+      case Some(game) =>
+        val blackjackGameState = blackjackGameStateDao.findLastBlackjackGameState(gameId)
+        Option(blackjackDeckService.getUserHands(game.blackjackDeckId, blackjackGameState))
+      case None => None
+    }
   }
 
-  def `dealer cards`(gameId: Int) = ???
+  def `dealer cards`(gameId: Int) = {
+    blackjackGameDao.findBlackjackGame(gameId) match {
+      case Some(game) =>
+        val blackjackGameState = blackjackGameStateDao.findLastBlackjackGameState(gameId)
+        Option(blackjackDeckService.getDealerHand(game.blackjackDeckId, blackjackGameState))
+      case None => None
+    }
+  }
 
   def hit(gameId: Int) = ???
 
