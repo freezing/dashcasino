@@ -7,7 +7,7 @@
 #
 # Host: 33.33.33.10 (MySQL 5.5.47-0ubuntu0.12.04.1)
 # Database: dashcasino
-# Generation Time: 2016-01-30 15:46:09 +0000
+# Generation Time: 2016-01-30 18:20:53 +0000
 # ************************************************************
 
 
@@ -68,6 +68,21 @@ CREATE TABLE `BlackjackCard` (
 
 
 
+# Dump of table BlackjackDeck
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `BlackjackDeck`;
+
+CREATE TABLE `BlackjackDeck` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `Order` varchar(1000) NOT NULL DEFAULT '',
+  `ServerSeed` varchar(200) NOT NULL DEFAULT '',
+  `ClientSeed` varchar(200) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
 # Dump of table BlackjackGame
 # ------------------------------------------------------------
 
@@ -77,12 +92,15 @@ CREATE TABLE `BlackjackGame` (
   `Id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `UserId` int(11) unsigned NOT NULL,
   `StatusCodeId` int(10) unsigned NOT NULL DEFAULT '0',
+  `BlackjackDeckId` int(11) unsigned NOT NULL,
   `Timestamp` datetime NOT NULL,
   PRIMARY KEY (`Id`),
   KEY `fk_userid` (`UserId`),
   KEY `fk_status` (`StatusCodeId`),
-  CONSTRAINT `fk_userid` FOREIGN KEY (`UserId`) REFERENCES `User` (`Id`),
-  CONSTRAINT `fk_status` FOREIGN KEY (`StatusCodeId`) REFERENCES `StatusCode` (`Id`)
+  KEY `fk_blackjackdeckid` (`BlackjackDeckId`),
+  CONSTRAINT `fk_blackjackdeckid` FOREIGN KEY (`BlackjackDeckId`) REFERENCES `BlackjackDeck` (`id`),
+  CONSTRAINT `fk_status` FOREIGN KEY (`StatusCodeId`) REFERENCES `StatusCode` (`Id`),
+  CONSTRAINT `fk_userid` FOREIGN KEY (`UserId`) REFERENCES `User` (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 

@@ -23,3 +23,7 @@
   // Akka
   libraryDependencies +=
     "com.typesafe.akka" %% "akka-actor" % "2.4.1"
+
+  // Argonaut (JSON library)
+  libraryDependencies +=
+    "io.argonaut" %% "argonaut" % "6.1"

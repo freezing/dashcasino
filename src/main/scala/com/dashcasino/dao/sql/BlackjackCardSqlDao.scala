@@ -14,5 +14,7 @@ class BlackjackCardSqlDao(implicit val session: AutoSession.type) {
 
   def findBlackjackCard(rankLetter: String, suitLetter: String) = sql"SELECT * FROM BlackjackCard WHERE RankLetter=$rankLetter AND SuitLetter=$suitLetter".map(toBlackjackCard).single().apply()
 
-  def unshuffledBlackjackCards() = sql"SELECT * FROM BlackjackCard ORDER BY Id".map(toBlackjackCard).list().apply()
+  def findBlackjackCard(code: Int) = sql"SELECT * FROM BlackjackCard WHERE Code=$code".map(toBlackjackCard).single.apply
+
+  def unshuffledBlackjackCards() = sql"SELECT * FROM BlackjackCard ORDER BY Id".map(toBlackjackCard).list.apply
 }

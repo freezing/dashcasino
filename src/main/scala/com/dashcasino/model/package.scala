@@ -1,8 +1,6 @@
 package com.dashcasino
 
-import java.sql.Timestamp
-
-import scala.collection.JavaConversions._
+import argonaut._, Argonaut._
 
 package object model {
   // TODO: Figure out if case classes can use apply methods
@@ -18,9 +16,18 @@ package object model {
   // Value represents card value in the blackjack game
   // NOTE: Primary and Secondary values are for the Ace
   case class BlackjackCard(id: Int, code: Int, rankCode: Int, rankName: String, rankLetter: String, suitName: String, suitLetter: String, suitCode: Int, primaryValue: Int, secondaryValue: Int)
+  case class BlackjackDeck(id: Int, order: String, serverSeed: String, clientSeed: String)
 
   // These two are not connected to any tables. They will just represent UserHand and DealerHand in a nice
-  // Case class format using agronaut, and convert hands to JSON ready string for SQL
-  case class BlackjackHand(hand: List[BlackjackCard])
+  // Case class format using argonaut, and convert hands to JSON ready string for SQL
+
+  // TODO: Status should be replaced by some enum or anything that is not plain string
+  // Status can be: OPEN, BUSTED, STANDING
+  case class BlackjackHand(hand: List[BlackjackCard], status: String)
   case class BlackjackHands(hands: List[BlackjackHand])
+
+  // Implicit JSON codec for Argonaut
+  implicit def BlackjackCardCodecJson = casecodec10(BlackjackCard.apply, BlackjackCard.unapply)("id", "code", "rankCode", "rankName", "rankLetter", "suitName", "suitLetter", "suitCode", "primaryValue", "secondaryValue")
+  implicit def BlackjackHandCodecJson = casecodec2(BlackjackHand.apply, BlackjackHand.unapply)("hand", "status")
+  implicit def BlackjackHandsCodecJson = casecodec1(BlackjackHands.apply, BlackjackHands.unapply)("hands")
 }

@@ -10,7 +10,17 @@ import scalikejdbc._
 class BlackjackGameSqlDao(implicit val session: AutoSession.type) {
   def toBlackjackGame(rr: WrappedResultSet) = BlackjackGame(rr.int("Id"), rr.int("UserId"), rr.time("Timestamp").getTime)
 
-  def insertBlackjackGame(blackjackGame: BlackjackGame) = sql"INSERT INTO BlackjackGame (UserId, Timestamp) VALUES (${blackjackGame.userId}, CURRENT_TIMESTAMP)".update().apply()
+  /**
+    * Inserts and returns inserted BlackjackGame
+    * @param blackjackGame
+    * @return
+    */
+  def insertBlackjackGame(blackjackGame: BlackjackGame): Option[BlackjackGame] = {
+    DB localTx { implicit session =>
+      sql"INSERT INTO BlackjackGame (UserId, Timestamp) VALUES (${blackjackGame.userId}, CURRENT_TIMESTAMP)".update().apply()
+      sql"SELECT * FROM BlackjackGame ORDER BY Id LIMIT 1".map(toBlackjackGame).single().apply()
+    }
+  }
 
   // No need for find yet
 }

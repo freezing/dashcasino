@@ -9,4 +9,5 @@ class CommandService(implicit val commandDao: CommandSqlDao) {
   // TODO: Implement command service - think about this
   val EXTERNAL_WITHDRAWAL = 0
   val EXTERNAL_DEPOSIT = 1
+  val BLACKJACK_BET = 2
 }
