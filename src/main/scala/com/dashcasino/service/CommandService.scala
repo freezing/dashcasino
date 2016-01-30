@@ -10,4 +10,7 @@ class CommandService(implicit val commandDao: CommandSqlDao) {
   val EXTERNAL_WITHDRAWAL = 0
   val EXTERNAL_DEPOSIT = 1
   val BLACKJACK_BET = 2
+  val BLACKJACK_HIT = 3
 }
+
+object CommandService extends CommandService

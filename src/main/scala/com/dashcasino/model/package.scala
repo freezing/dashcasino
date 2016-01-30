@@ -22,7 +22,7 @@ package object model {
   // Case class format using argonaut, and convert hands to JSON ready string for SQL
 
   // TODO: Status should be replaced by some enum or anything that is not plain string
-  // Status can be: OPEN, BUSTED, STANDING
+  // Status can be: OPEN, BUSTED, STANDING, DOUBLE-DOWN (if double-downed but busted it will be BUSTED)
   case class BlackjackHand(hand: List[BlackjackCard], status: String)
   case class BlackjackHands(hands: List[BlackjackHand])
 
