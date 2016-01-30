@@ -42,6 +42,8 @@ package object dao {
   implicit val accountDao = new AccountSqlDao
   implicit val transactionDao = new TransactionSqlDao
   implicit val userDao = new UserSqlDao
+  implicit val blackjackCardDao = new BlackjackCardSqlDao
+  implicit val blackjackDeckDao = new BlackjackDeckSqlDao
   implicit val blackjackGameStateDao = new BlackjackGameStateSqlDao
   implicit val blackjackGameDao = new BlackjackGameSqlDao
 }
