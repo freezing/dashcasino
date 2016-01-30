@@ -27,10 +27,3 @@ class UserSqlDao(implicit accountSqlDao: AccountSqlDao, session: AutoSession.typ
     }
   }
 }
-
-object Test extends App {
-  import com.dashcasino.dao._
-  implicit val walletService = new WalletService
-  val userService = new UserService
-  userService.registerUser(User(-1, "test@gmail.com", "asd123", -1))
-}

@@ -6,6 +6,10 @@ package com.dashcasino
 package object services {
   def hash(plain: String): String = {
     // TODO: Implement a hash function (Use library ofc :D)
-    return plain
+    plain
   }
+
+  // Implicit services
+  implicit val walletService = new WalletService
+  implicit val userService = new UserService
 }
