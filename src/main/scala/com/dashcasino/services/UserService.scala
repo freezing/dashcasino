@@ -1,21 +1,28 @@
 package com.dashcasino.services
 
-import scalikejdbc._
+import com.dashcasino.models.User
+import com.dashcasino.services.dao.sql.SqlDao
+import com.dashcasino.services.dao.{DaoStatusCode, ResultCode}
 
 /**
   * Created by freezing on 1/27/16.
   */
-object UserService extends App {
+trait UserService {
+  def dao: SqlDao
 
-  // initialize JDBC driver & connection pool
-  Class.forName("com.mysql.jdbc.Driver")
-  ConnectionPool.singleton("jdbc:mysql://33.33.33.10:3306/bankstatementprofiler", "root", "root")
+  def registerUser(user: User): ResultCode = {
+    try {
+      dao.insertUser(user)
+      ResultCode(DaoStatusCode.OK, "Registration successful")
+    } catch {
+      case e: Exception => ResultCode(DaoStatusCode.ERROR, s"User with email: ${user.email} already exists!")
+    }
+  }
 
-  // ad-hoc session provider on the REPL
-  implicit val session = AutoSession
-
-  val rawValue = "THis is a raw transaction"
-
-
-  sql"INSERT INTO RawTransaction (RowValue) VALUES ($rawValue)".update().apply()
+  def loginUser(user: User): ResultCode = {
+    dao.findUser(user.email) match {
+      case Some(_) => ResultCode(DaoStatusCode.OK, "User credentials match!")
+      case None => ResultCode(DaoStatusCode.ERROR, "User credentials are invalid!")
+    }
+  }
 }
