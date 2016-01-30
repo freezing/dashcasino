@@ -1,4 +1,4 @@
-package com.dashcasino.services
+package com.dashcasino
 
 import scalikejdbc.{LoggingSQLAndTimeSettings, GlobalSettings, AutoSession, ConnectionPool}
 

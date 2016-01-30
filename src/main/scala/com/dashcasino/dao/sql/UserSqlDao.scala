@@ -1,7 +1,6 @@
-package com.dashcasino.services.dao.sql
+package com.dashcasino.dao.sql
 
 import com.dashcasino.models.User
-import com.dashcasino.services.dao.{DaoStatusCode, ResultCode}
 import scalikejdbc._
 
 /**

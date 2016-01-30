@@ -1,4 +1,4 @@
-package com.dashcasino.services.dao.sql
+package com.dashcasino.dao.sql
 
 /**
   * Created by freezing on 1/28/16.

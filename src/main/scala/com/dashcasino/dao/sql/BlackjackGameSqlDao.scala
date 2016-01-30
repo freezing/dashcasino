@@ -1,4 +1,4 @@
-package com.dashcasino.services.dao.sql
+package com.dashcasino.dao.sql
 
 import com.dashcasino.models.{BlackjackGame, Transaction}
 
