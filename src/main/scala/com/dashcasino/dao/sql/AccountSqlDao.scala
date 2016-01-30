@@ -12,5 +12,13 @@ class AccountSqlDao(implicit val session: AutoSession.type) {
 
   def insertAccount(account: Account) = sql"INSERT INTO Account (UserId, DepositAddress, Amount) VALUES (${account.userId}, ${account.depositAddress}, ${account.amount})".update().apply()
 
-  def findAccount(userId: Int): Option[Account] = sql"SELECT * FROM User WHERE UserId=$userId".map(toAccount).single().apply()
+  def findAccount(userId: Int): Option[Account] = sql"SELECT * FROM Account WHERE UserId=$userId".map(toAccount).single().apply()
+
+  def updateMoney(accountId: Int, amount: BigDecimal) = {
+    if (amount < 0) {
+      sql"UPDATE Account SET Amount=Amount-${-amount} WHERE AccountId=$accountId".update().apply()
+    } else {
+      sql"UPDATE Account SET Amount=Amount+$amount WHERE AccountId=$accountId".update().apply()
+    }
+  }
 }

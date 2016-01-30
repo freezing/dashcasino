@@ -32,6 +32,7 @@ package object dao {
   class DaoStatusCode extends Enumeration {
     val OK = Value(0)
     val ERROR = Value(1)
+    val SERVER_ERROR = Value(2)
   }
   object DaoStatusCode extends DaoStatusCode
   case class ResultCode(status: DaoStatusCode.Value, description: String)
