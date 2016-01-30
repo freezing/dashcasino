@@ -10,6 +10,19 @@ import scalikejdbc.DB
   */
 class AccountService(implicit val accountDao: AccountSqlDao, transactionDao: TransactionSqlDao,
                      walletService: WalletService, commandService: CommandService) {
+  def internalWithdraw(user: User, gameId: Int, amount: BigDecimal): ResultCode = {
+    ???
+
+  }
+
+  def internalDeposit(user: User, gameId: Int, amount: BigDecimal): ResultCode = {
+    ???
+  }
+
+  def externalDeposit(user: User, amount: BigDecimal): ResultCode = {
+    ???
+  }
+
   // TODO: Check if it is better to have user as parameter, or account.
   def externalWithdraw(user: User, payoutAddress: String, amount: BigDecimal): ResultCode = {
     // TODO: Make sure user exists, it has valid id, some checks since this is very important
