@@ -1,6 +1,6 @@
 package com.dashcasino.dao.sql
 
-import com.dashcasino.models.Transaction
+import com.dashcasino.model.Transaction
 
 import scalikejdbc._
 

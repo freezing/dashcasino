@@ -1,6 +1,7 @@
 package com.dashcasino
 
-import com.dashcasino.dao.sql.{UserSqlDao, AccountSqlDao}
+import com.dashcasino.dao.sql.{CommandSqlDao, TransactionSqlDao, UserSqlDao, AccountSqlDao}
+import org.h2.mvstore.db.TransactionStore.Transaction
 import scalikejdbc.{LoggingSQLAndTimeSettings, GlobalSettings, AutoSession, ConnectionPool}
 
 /**
@@ -36,6 +37,8 @@ package object dao {
   case class ResultCode(status: DaoStatusCode.Value, description: String)
 
   // Implicit instances for SqlDao
+  implicit val commandDao = new CommandSqlDao
   implicit val accountDao = new AccountSqlDao
+  implicit val transactionDao = new TransactionSqlDao
   implicit val userDao = new UserSqlDao
 }

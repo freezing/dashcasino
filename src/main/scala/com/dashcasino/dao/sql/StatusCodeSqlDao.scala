@@ -1,6 +1,6 @@
 package com.dashcasino.dao.sql
 
-import com.dashcasino.models.StatusCode
+import com.dashcasino.model.StatusCode
 
 import scalikejdbc._
 

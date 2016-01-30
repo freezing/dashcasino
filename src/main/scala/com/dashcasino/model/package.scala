@@ -4,7 +4,7 @@ import java.sql.Timestamp
 
 import scala.collection.JavaConversions._
 
-package object models {
+package object model {
   // TODO: Figure out if case classes can use apply methods
   case class User(id: Int, email: String, passwordHash: String, timestamp: Long)
   case class Account(id: Int, userId: Int, depositAddress: String, amount: BigDecimal)
