@@ -1,22 +1,22 @@
 package com.dashcasino.services
 
 import com.dashcasino.models.User
-import com.dashcasino.dao.sql.SqlDao
+import com.dashcasino.dao.sql.UserSqlDao
 import com.dashcasino.dao.{DaoStatusCode, ResultCode}
+import scalikejdbc.DB
 
 /**
   * Created by freezing on 1/27/16.
   */
-trait UserService {
-  def dao: SqlDao
+class UserService(implicit dao: UserSqlDao, walletService: WalletService) {
+  // User registration needs WalletService to be able to generate depositAddress
 
   def registerUser(user: User): ResultCode = {
     try {
-      dao.insertUser(user)
-      // TODO: Get inserted User (need this for userId, maybe find a better solution later)
-      // TODO: Create User Account
+      dao.registerUser(user, walletService.generateDepositAddress)
       ResultCode(DaoStatusCode.OK, "Registration successful")
     } catch {
+      // TODO: Wallet should be able to throw exception if it fails to generate new address and it should be caught here
       case e: Exception => ResultCode(DaoStatusCode.ERROR, s"User with email: ${user.email} already exists!")
     }
   }

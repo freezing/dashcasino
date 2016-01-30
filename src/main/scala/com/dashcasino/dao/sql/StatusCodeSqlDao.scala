@@ -7,7 +7,7 @@ import scalikejdbc._
 /**
   * Created by freezing on 1/28/16.
   */
-trait StatusCodeSqlDao { self: SqlDao =>
+class StatusCodeSqlDao(implicit val session: AutoSession.type) {
   def toStatusCode(rr: WrappedResultSet) = StatusCode(rr.int("Id"), rr.string("Value"))
 
   def insertStatusCode(statusCode: StatusCode) = sql"INSERT INTO StatusCode (Value) VALUES (${statusCode.value})".update().apply()

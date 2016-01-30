@@ -7,7 +7,7 @@ import scalikejdbc._
 /**
   * Created by freezing on 1/28/16.
   */
-trait CommandSqlDao { self: SqlDao =>
+class CommandSqlDao(implicit val session: AutoSession.type) {
   def toCommand(rr: WrappedResultSet) = Command(rr.int("Id"), rr.string("Name"))
 
   def insertCommand(command: Command) = sql"INSERT INTO Command (Name) VALUES (${command.name})".update().apply()

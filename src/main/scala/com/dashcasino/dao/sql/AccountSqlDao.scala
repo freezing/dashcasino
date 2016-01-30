@@ -7,7 +7,7 @@ import scalikejdbc._
 /**
   * Created by freezing on 1/28/16.
   */
-trait AccountSqlDao { self: SqlDao =>
+class AccountSqlDao(implicit val session: AutoSession.type) {
   def toAccount(rr: WrappedResultSet) = Account(rr.int("Id"), rr.int("UserId"), rr.string("DepositAddress"), rr.bigDecimal("Amount"))
 
   def insertAccount(account: Account) = sql"INSERT INTO Account (UserId, DepositAddress, Amount) VALUES (${account.userId}, ${account.depositAddress}, ${account.amount})".update().apply()

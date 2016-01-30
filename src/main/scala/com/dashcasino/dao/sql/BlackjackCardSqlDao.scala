@@ -7,7 +7,7 @@ import scalikejdbc._
 /**
   * Created by freezing on 1/28/16.
   */
-trait BlackjackCardSqlDao { self: SqlDao =>
+class BlackjackCardSqlDao(implicit val session: AutoSession.type) {
   def toBlackjackCard(rr: WrappedResultSet) = BlackjackCard(rr.int("Id"), rr.int("Code"), rr.int("RankCode"), rr.string("RankName"), rr.string("RankLetter"), rr.string("SuitName"), rr.string("SuitLetter"), rr.int("SuitCode"), rr.int("PrimaryValue"), rr.int("SecondaryValue"))
 
   def insertBlackjackCard(card: BlackjackCard) = sql"INSERT INTO BlackjackCard (Code, RankCode, RankName, RankLetter, SuitName, SuitLetter, SuitCode, PrimaryValue, SecondaryValue) VALUES (${card.rankCode}, ${card.rankName}, ${card.rankLetter}, ${card.suitName}, ${card.suitCode}, ${card.primaryValue}, ${card.secondaryValue})".update().apply()

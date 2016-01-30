@@ -7,7 +7,7 @@ import scalikejdbc._
 /**
   * Created by freezing on 1/28/16.
   */
-trait BlackjackGameStateSqlDao { self: SqlDao =>
+class BlackjackGameStateSqlDao(implicit val session: AutoSession.type) {
   def toBlackjackGameState(rr: WrappedResultSet) = BlackjackGameState(rr.int("Id"), rr.int("UserId"), rr.int("GameId"), rr.string("UserHand"), rr.string("DealerHand"), rr.string("Description"), rr.int("LastCommandId"), rr.int("StatusCodeId"), rr.time("Timestamp").getTime)
 
   def insertBlackjackGameState(blackjackGameState: BlackjackGameState) =

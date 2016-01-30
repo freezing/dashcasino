@@ -1,4 +1,4 @@
-package com.dashcasino.services
+package com.dashcasino.routing
 
 import spray.routing.HttpService
 
