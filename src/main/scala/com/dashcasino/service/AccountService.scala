@@ -37,7 +37,7 @@ class AccountService(implicit val accountDao: AccountSqlDao, transactionDao: Tra
 
   /**
     * This is not thread safe on account level (can be done by using SQL transactions but if changed to NoSQL later it would make no sense.
-    * Thread-safe should be handeled in the top level Actor that will process all messages per Account (which is good solution).
+    * Thread-safe should be handled in the top level Actor that will process all messages per Account (which is good solution).
     *
     * @param user
     * @param gameId
