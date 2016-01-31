@@ -3,12 +3,16 @@ package com.dashcasino.service.blackjack.logic
 import com.dashcasino.dao.sql.BlackjackCardSqlDao
 import com.dashcasino.model._
 
+import argonaut._
+import Argonaut._
+import com.dashcasino.service.CommandService
+
 /**
   * Created by freezing on 1/31/16.
   */
 trait BlackjackStateTransitionHit { self: BlackjackStateTransition =>
-  def nextStateAfterHit(deck: BlackjackDeck, userHands: BlackjackHands, dealerHand: BlackjackHand, cards: List[Int], nextCard: Int)
-                       (implicit blackjackCardDao: BlackjackCardSqlDao: BlackjackGameState = {
+  def nextStateAfterHit(oldState: BlackjackGameState, deck: BlackjackDeck, userHands: BlackjackHands, dealerHand: BlackjackHand, nextCard: Int)
+                       (implicit blackjackCardDao: BlackjackCardSqlDao): BlackjackGameState = {
 
     // Find user's hand that is open with priority for the first one
     // TODO: IMPORTANT, REFACTOR THIS CODE SO IT USES SCALA BUILT-IN METHODS INSTEAD OF FOR COMPREHENSION OVER INDICES
@@ -38,6 +42,13 @@ trait BlackjackStateTransitionHit { self: BlackjackStateTransition =>
       }
       hand.copy(cards = newCards, status = newStatus)
     }
+    val newUserBlackjackHands = BlackjackHands(newHands)
+    // TODO: UPDATE STATUS CODE
 
+    val newDealerHand = {
+      if (isGameFinished(newUserBlackjackHands)) getFinalDealerHand(newUserBlackjackHands, dealerHand, deck)
+      else dealerHand
+    }
+    oldState.copy(userHand = newUserBlackjackHands.asJson.spaces2, dealerHand = newDealerHand.asJson.spaces2, commandId = CommandService.BLACKJACK_HIT)
   }
 }

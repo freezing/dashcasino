@@ -11,7 +11,7 @@ import Argonaut._
 /**
   * Created by freezing on 1/31/16.
   */
-class BlackjackStateTransition extends BlackjackStateTransitionHit { self: BlackjackService =>
+trait BlackjackStateTransition extends BlackjackStateTransitionHit with BlackjackStateTransitionDealerDrawing { self: BlackjackService =>
   def hideIfNotBlackjack(hand: BlackjackHand): BlackjackHand = {
     isBlackjack(hand.cards) match {
       case true => hand.copy(status = BlackjackHandStatus.BLACKJACK)
@@ -75,16 +75,14 @@ class BlackjackStateTransition extends BlackjackStateTransitionHit { self: Black
   def getNextState(blackjackDeckId: Int, blackjackGameState: BlackjackGameState, commandId: Int)
                   (implicit blackjackDeckDao: BlackjackDeckSqlDao, blackjackCardDao: BlackjackCardSqlDao): BlackjackGameState = {
     val deck = getDeck(blackjackDeckId)
-
     val dealerHand = decodeDealerHand(blackjackGameState.dealerHand)
     val userHands = decodeUserHands(blackjackGameState.userHand)
 
-    val cards = deck.order.cards
     // Draw next card for the state
-    val nextCard = cards(dealerHand.cards.length + userHands.hands.head.cards.length + userHands.hands(1).cards.length)
+    val nextCard = deck.order.cards(dealerHand.cards.length + userHands.hands.head.cards.length + userHands.hands(1).cards.length)
 
     commandId match {
-      case CommandService.BLACKJACK_HIT => nextStateAfterHit(deck, userHands, dealerHand, cards, nextCard)
+      case CommandService.BLACKJACK_HIT => nextStateAfterHit(blackjackGameState, deck, userHands, dealerHand, nextCard)
       case unknownCommand => throw new NotImplementedException(s"Command $unknownCommand hasn't been implemented yet!")
     }
   }
