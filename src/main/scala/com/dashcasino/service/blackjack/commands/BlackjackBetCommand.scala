@@ -9,13 +9,13 @@ import com.dashcasino.service.{BlackjackDeckService, CommandService, BlackjackSe
   */
 trait BlackjackBetCommand { self: BlackjackService =>
   def bet(userId: Int, blackjackDeckId: Int, amount: BigDecimal)
-         (implicit blackjackDeckService: BlackjackDeckService, blackjackGameStateDao: BlackjackGameStateSqlDao): Option[BlackjackGame] = {
+         (implicit blackjackDeckService: BlackjackDeckService, blackjackGameStateDao: BlackjackGameStateSqlDao): BlackjackGame = {
     blackjackGameDao.insertBlackjackGame(BlackjackGame(-1, userId, blackjackDeckId, -1)) match {
       case Some(game) =>
         // Create initial state for the game
-        val blackjackGameState = blackjackDeckService.getNextState(blackjackDeckId, None, CommandService.BLACKJACK_BET)
+        val blackjackGameState = getInitialState(blackjackDeckId)
         blackjackGameStateDao.insertBlackjackGameState(blackjackGameState)
-        Option(game)
+        game
       // TODO: Send email report
       case None => throw new Exception("Couldn't create new blackjack game")
     }

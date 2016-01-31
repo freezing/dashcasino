@@ -1,7 +1,7 @@
 package com.dashcasino.service.blackjack.commands
 
 import com.dashcasino.dao.sql.BlackjackGameStateSqlDao
-import com.dashcasino.model.BlackjackHands
+import com.dashcasino.model.{BlackjackHand, BlackjackGameState, BlackjackHands}
 import com.dashcasino.service.{BlackjackDeckService, BlackjackService}
 
 /**
@@ -10,23 +10,23 @@ import com.dashcasino.service.{BlackjackDeckService, BlackjackService}
 trait BlackjackGetCardsCommands { self: BlackjackService =>
   // TODO: Check if it is user's game
   def `user cards`(userId: Int, gameId: Int)
-      (implicit blackjackDeckService: BlackjackDeckService, blackjackGameStateDao: BlackjackGameStateSqlDao): Option[BlackjackHands] = {
-    blackjackGameDao.findBlackjackGame(gameId) match {
-      case Some(game) =>
-        val blackjackGameState = blackjackGameStateDao.findLastBlackjackGameState(gameId)
-        Option(blackjackDeckService.getUserHands(game.blackjackDeckId, blackjackGameState))
-      case None => None
-    }
+      (implicit blackjackDeckService: BlackjackDeckService, blackjackGameStateDao: BlackjackGameStateSqlDao): BlackjackHands = {
+    val blackjackGameState = blackjackGameStateDao.findLastBlackjackGameState(gameId).get
+    userHands(blackjackGameState)
   }
 
   // TODO: Check if it is user's game
   def `dealer cards`(userId: Int, gameId: Int)
                     (implicit blackjackDeckService: BlackjackDeckService, blackjackGameStateDao: BlackjackGameStateSqlDao) = {
-    blackjackGameDao.findBlackjackGame(gameId) match {
-      case Some(game) =>
-        val blackjackGameState = blackjackGameStateDao.findLastBlackjackGameState(gameId)
-        Option(blackjackDeckService.getDealerHand(game.blackjackDeckId, blackjackGameState))
-      case None => None
-    }
+    val blackjackGameState = blackjackGameStateDao.findLastBlackjackGameState(gameId).get
+    dealerHand(blackjackGameState)
+  }
+
+  def userHands(state: BlackjackGameState): BlackjackHands = {
+    decodeUserHands(state.userHand)
+  }
+
+  def dealerHand(state: BlackjackGameState): BlackjackHand = {
+    decodeDealerHand(state.dealerHand)
   }
 }

@@ -32,12 +32,11 @@ trait BlackjackHitCommand { self: BlackjackService =>
     if (!canHit(gameState)) throw new CantHitException
 
     // Get next game state and insert it in the database
-    val nextGameState = blackjackDeckService.getNextState(game.blackjackDeckId, gameState, CommandService.BLACKJACK_HIT)
+    val nextGameState = getNextState(game.blackjackDeckId, gameState, CommandService.BLACKJACK_HIT)
     blackjackGameStateDao.insertBlackjackGameState(nextGameState)
 
     // Return user's hands
-    // TODO: Don't use Option once getUserHands(blackjackId, gameState) is implemented
-    blackjackDeckService.getUserHands(game.blackjackDeckId, Option(gameState))
+    userHands(nextGameState)
   }
 
   def canHit(gameState: BlackjackGameState): Boolean = {
