@@ -9,14 +9,14 @@ import Argonaut._
   * Created by freezing on 1/31/16.
   */
 trait BlackjackStateTransitionStand { self: BlackjackStateTransition =>
-  def nextStateAfterStand(blackjackGameState: BlackjackGameState, userHands: BlackjackHands): BlackjackGameState = {
+  def nextStateAfterStand(blackjackGameState: BlackjackGameState, userHands: BlackjackHands, handStatus: String = BlackjackHandStatus.STANDING): BlackjackGameState = {
     val newHands = {
       var updatedOnce = false
       userHands.hands map { hand =>
         // TODO: DEFINITELY REFACTOR xD
         if (!updatedOnce && hand.status == BlackjackHandStatus.OPEN) {
           updatedOnce = true
-          hand.copy(status = BlackjackHandStatus.STANDING)
+          hand.copy(status = handStatus)
         } else {
           hand
         }

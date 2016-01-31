@@ -62,8 +62,8 @@ class AccountService(implicit val accountDao: AccountSqlDao, transactionDao: Tra
   }
 
   // TODO: In the future reason should be created outside of the AccountService
-  def internalDeposit(user: User, gameId: Int, commandId: Int, amount: BigDecimal): ResultCode = {
-    accountDao.findAccount(user.id) match {
+  def internalDeposit(userId: Int, gameId: Int, commandId: Int, amount: BigDecimal): ResultCode = {
+    accountDao.findAccount(userId) match {
       case Some(account) =>
         try {
           internalUpdate(account, gameId, commandId, amount)
@@ -77,8 +77,8 @@ class AccountService(implicit val accountDao: AccountSqlDao, transactionDao: Tra
     }
   }
 
-  def externalDeposit(user: User, amount: BigDecimal): ResultCode = {
-    accountDao.findAccount(user.id) match {
+  def externalDeposit(userId: Int, amount: BigDecimal): ResultCode = {
+    accountDao.findAccount(userId) match {
       case Some(account) =>
         try {
           checkMoney(account, amount)

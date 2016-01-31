@@ -13,8 +13,6 @@ import com.dashcasino.service.blackjack.logic.BlackjackStateTransition
   */
 class BlackjackService(implicit val blackjackGameDao: BlackjackGameSqlDao, blackjackGameStateDao: BlackjackGameStateSqlDao, blackjackCardDao: BlackjackCardSqlDao, blackjackDeckSqlDao: BlackjackDeckSqlDao)
     extends BlackjackBetCommand with BlackjackGetCardsCommands with BlackjackHitCommand with BlackjackStateTransition with BlackjackStandCommand {
-  def `double-down`(gameId: Int) = ???
-
   def split(gameId: Int) = ???
 
   def insurance(gameId: Int) = ???
