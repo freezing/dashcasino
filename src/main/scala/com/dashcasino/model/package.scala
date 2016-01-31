@@ -3,11 +3,23 @@ package com.dashcasino
 import argonaut._, Argonaut._
 
 package object model {
+  object BlackjackCardCodes {
+    val FACE_DOWN = 0
+  }
+
   object BlackjackHandStatus {
+    val EMPTY = "EMPTY" // This is used for the user's second hand when it doesn't exist
+    val DEALER = "DEALER" // THis is used for the dealer state where one card is facedown
     val OPEN = "OPEN"
     val BUSTED = "BUSTED"
     val DOUBLE_DOWN = "DOUBLE-DOWN"
     val STANDING = "STANDING"
+    val BLACKJACK = "BLACKJACK"
+  }
+
+  object BlackjackStatusCodes {
+    val PENDING = "PENDING"
+    val FINISHED = "FINISHED"
   }
 
   // TODO: Figure out if case classes can use apply methods
@@ -29,7 +41,7 @@ package object model {
   // These two are not connected to any tables. They will just represent UserHand and DealerHand in a nice
   // Case class format using argonaut, and convert hands to JSON ready string for SQL
 
-  // Status can be: OPEN, BUSTED, STANDING, DOUBLE-DOWN (if double-downed but busted it will be BUSTED)
+  // Status can be: OPEN, BUSTED, STANDING, DOUBLE-DOWN (if double-downed but busted it will be BUSTED), BLACKJACK
   case class BlackjackHand(cards: List[BlackjackCard], status: String, money: BigDecimal)
   case class BlackjackHands(hands: List[BlackjackHand])
 

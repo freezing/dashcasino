@@ -11,10 +11,65 @@ import Argonaut._
 /**
   * Created by freezing on 1/31/16.
   */
-trait BlackjackStateTransition { self: BlackjackService =>
-  def getInitialState(blackjackDeckId: Int)(implicit blackjackDeckDao: BlackjackDeckSqlDao, blackjackCardDao: BlackjackCardSqlDao): BlackjackGameState = {
+class BlackjackStateTransition extends BlackjackStateTransitionHit { self: BlackjackService =>
+  def hideIfNotBlackjack(hand: BlackjackHand): BlackjackHand = {
+    isBlackjack(hand.cards) match {
+      case true => hand.copy(status = BlackjackHandStatus.BLACKJACK)
+      case false => hand.copy(cards = List(getCard(BlackjackCardCodes.FACE_DOWN), hand.cards(1)))
+    }
+  }
 
-    ???
+  def drawCard(hand: BlackjackHand, card: BlackjackCard): BlackjackHand = {
+    val newCards = hand.cards ++ List(card)
+    val status = getStatus(newCards)
+    hand.copy(cards = newCards, status = status)
+  }
+
+  def getStatus(cards: List[BlackjackCard]) = {
+    if (isBlackjack(cards)) BlackjackHandStatus.BLACKJACK
+    else if (isOpen(cards)) BlackjackHandStatus.OPEN
+    else if (isBusted(cards)) BlackjackHandStatus.BUSTED
+    else BlackjackHandStatus.STANDING
+  }
+
+  def createHand(firstCardCode: Int, secondCardCode: Int, money: BigDecimal): BlackjackHand = {
+    val card1 = getCard(firstCardCode)
+    val card2 = getCard(secondCardCode)
+    val cards = List(card1, card2)
+    BlackjackHand(cards, getStatus(cards), money)
+  }
+
+  def createInitialUserHand(deck: BlackjackDeck, money: BigDecimal): BlackjackHand =
+    createHand(deck.order.cards(0), deck.order.cards(2), money)
+
+  def createInitialDealerHand(deck: BlackjackDeck, money: BigDecimal): BlackjackHand =
+    hideIfNotBlackjack(createHand(deck.order.cards(1), deck.order.cards(3), money))
+
+  /**
+    * Initial state is created by the following rules:
+    * 1. Draw card and deal it to player face-up
+    * 2. Draw card and deal it to dealer face-down
+    * 3. Draw card and deal it to player face-up
+    * 4. Draw card and deal it to dealer face-up
+ *
+    * @param blackjackDeckId Deck id used to retrieve deck configuration (i.e. order)
+    * @param blackjackDeckDao
+    * @param blackjackCardDao
+    * @return Initial BlackjackGameState after the BET is placed.
+    */
+  def getInitialState(blackjackDeckId: Int, gameId: Int, money: BigDecimal)(implicit blackjackDeckDao: BlackjackDeckSqlDao, blackjackCardDao: BlackjackCardSqlDao): BlackjackGameState = {
+    val deck = getDeck(blackjackDeckId)
+
+    // User hand is created from cards at indices 0 and 2
+    val firstUserHand = createInitialUserHand(deck, money)
+    val userBlackjackHands = List(firstUserHand, BlackjackHand(List.empty[BlackjackCard], BlackjackHandStatus.EMPTY, 0.0))
+    val userHand = BlackjackHands(userBlackjackHands)
+
+    val description = "Nothing for now"
+    val dealerHand = createInitialDealerHand(deck, money)
+    val statusCode = 0 // TODO: Figure out what is the status code and if we need it at all
+
+    BlackjackGameState(-1, gameId, userHand.asJson.spaces2, dealerHand.asJson.spaces2, description, CommandService.BLACKJACK_BET, statusCode, -1)
   }
 
   def getNextState(blackjackDeckId: Int, blackjackGameState: BlackjackGameState, commandId: Int)
@@ -29,57 +84,51 @@ trait BlackjackStateTransition { self: BlackjackService =>
     val nextCard = cards(dealerHand.cards.length + userHands.hands.head.cards.length + userHands.hands(1).cards.length)
 
     commandId match {
-      case CommandService.BLACKJACK_HIT =>
-        // Find user's hand that is open with priority for the first one
-        // TODO: IMPORTANT, REFACTOR THIS CODE SO IT USES SCALA BUILT-IN METHODS INSTEAD OF FOR COMPREHENSION OVER INDICES
-
-        // Add new card to the first OPEN hand (the one matching idx)
-        var foundOpenHand = false
-        val newHands = userHands.hands map { hand =>
-          val newCards = {
-            if (!foundOpenHand && hand.status == "OPEN") {
-              foundOpenHand = true
-              val bjCard = blackjackCardDao.findBlackjackCard(nextCard) match {
-                case Some(card) => card
-                case None => throw new IllegalStateException(s"Unknown card code: $nextCard")
-              }
-              hand.cards ++ List(bjCard)
-            } else {
-              hand.cards
-            }
-          }
-          // Update cards, status, money (stays the same)
-          val newStatus = {
-            // TODO: Implement logic for status after HIT
-            // If at least one value is open
-            if (isOpen(newCards)) BlackjackHandStatus.OPEN
-            else if (isBusted(newCards)) BlackjackHandStatus.BUSTED
-            else BlackjackHandStatus.STANDING // THIS IS THE CASE WHEN HAND VALUE IS 21 EXACTLY
-          }
-          hand.copy(cards = newCards, status = newStatus)
-        }
-        //        BlackjackGameState(-1, blackjackGameState.gameId, newHands)
-        ???
-      // TODO: Implement logic for HIT
+      case CommandService.BLACKJACK_HIT => nextStateAfterHit(deck, userHands, dealerHand, cards, nextCard)
       case unknownCommand => throw new NotImplementedException(s"Command $unknownCommand hasn't been implemented yet!")
     }
   }
 
   def isOpen(cards: List[BlackjackCard]): Boolean = {
-    val (v1, v2) = calculateHandValue(cards)
-    isOpen(v1) || isOpen(v2)
+    val openValues = calculateHandValues(cards) collect {
+      case v: Int if isOpen(v) => v
+    }
+    openValues.nonEmpty
   }
 
   def isOpen(v: Int): Boolean = v >= 0 && v < 21
 
   def isBusted(cards: List[BlackjackCard]): Boolean = {
-    val (v1, v2) = calculateHandValue(cards)
-    isBusted(v1) && isBusted(v2)
+    val nonBustedValues = calculateHandValues(cards) collect {
+      case v: Int if !isBusted(v) => v
+    }
+    nonBustedValues.isEmpty
   }
 
   def isBusted(v: Int) = v < 0 || v > 21
 
-  def calculateHandValue(cards: List[BlackjackCard]): (Int, Int) = {
-    ???
+  def isBlackjack(cards: List[BlackjackCard]): Boolean = {
+    val value21 = calculateHandValues(cards) collect {
+      case v: Int if v == 21 => v
+    }
+    cards.length == 2 && value21.nonEmpty
   }
+
+  def calculateHandValues(cards: List[BlackjackCard]): List[Int] = {
+    val softHand = (cards map { c => getSoftValue(c) }).sum
+    // Ace has valid both primary and secondary values
+    val hasAce = (cards collect { case c if isValidValue(c.primaryValue) && isValidValue(c.secondaryValue) => c}).nonEmpty
+    val hardHand = softHand + { if (hasAce) 10 else 0 }
+    List(softHand, hardHand)
+  }
+
+  def getSoftValue(card: BlackjackCard): Int = {
+    // If both values are valid return minimum
+    // else return primary value (it is always valid)
+
+    if (isValidValue(card.primaryValue) && isValidValue(card.secondaryValue)) Math.min(card.primaryValue, card.secondaryValue)
+    else card.primaryValue
+  }
+
+  def isValidValue(value: Int): Boolean = value >= 1 && value <= 11
 }

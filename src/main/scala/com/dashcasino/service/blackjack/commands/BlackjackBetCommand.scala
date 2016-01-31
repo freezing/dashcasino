@@ -13,7 +13,7 @@ trait BlackjackBetCommand { self: BlackjackService =>
     blackjackGameDao.insertBlackjackGame(BlackjackGame(-1, userId, blackjackDeckId, -1)) match {
       case Some(game) =>
         // Create initial state for the game
-        val blackjackGameState = getInitialState(blackjackDeckId)
+        val blackjackGameState = getInitialState(blackjackDeckId, game.id, amount)
         blackjackGameStateDao.insertBlackjackGameState(blackjackGameState)
         game
       // TODO: Send email report

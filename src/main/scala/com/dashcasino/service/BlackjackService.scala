@@ -1,8 +1,7 @@
 package com.dashcasino.service
 
-import com.dashcasino.dao.{DaoStatusCode, ResultCode}
-import com.dashcasino.dao.sql.{BlackjackDeckSqlDao, BlackjackGameSqlDao, BlackjackGameStateSqlDao}
-import com.dashcasino.exception.{IllegalRequestException, AuthorizationException, CantHitException}
+import com.dashcasino.dao.sql.{BlackjackCardSqlDao, BlackjackDeckSqlDao, BlackjackGameSqlDao, BlackjackGameStateSqlDao}
+import com.dashcasino.exception.{IllegalRequestException, AuthorizationException}
 import com.dashcasino.model._
 
 import argonaut._, Argonaut._
@@ -12,7 +11,7 @@ import com.dashcasino.service.blackjack.logic.BlackjackStateTransition
 /**
   * Created by freezing on 1/30/16.
   */
-class BlackjackService(implicit val blackjackGameDao: BlackjackGameSqlDao, blackjackGameStateDao: BlackjackGameStateSqlDao, blackjackDeckService: BlackjackDeckService)
+class BlackjackService(implicit val blackjackGameDao: BlackjackGameSqlDao, blackjackGameStateDao: BlackjackGameStateSqlDao, blackjackCardDao: BlackjackCardSqlDao, blackjackDeckSqlDao: BlackjackDeckSqlDao)
     extends BlackjackBetCommand with BlackjackGetCardsCommands with BlackjackHitCommand with BlackjackStateTransition{
   def `double-down`(gameId: Int) = ???
 
@@ -26,7 +25,12 @@ class BlackjackService(implicit val blackjackGameDao: BlackjackGameSqlDao, black
     if (userId != game.userId) throw new AuthorizationException(s"User $userId has no authorization over game: $game")
   }
 
-  def getDeck(deckId: Int)(implicit blackjackDeckSqlDao: BlackjackDeckSqlDao): BlackjackDeck =
+  def getCard(code: Int): BlackjackCard = blackjackCardDao.findBlackjackCard(code) match {
+    case Some(x) => x
+    case None => throw new IllegalRequestException(s"Invalid card code: $code")
+  }
+
+  def getDeck(deckId: Int): BlackjackDeck =
     blackjackDeckSqlDao.findBlackjackDeck(deckId) match {
       case Some(x) => x
       // TODO: Send email report
