@@ -21,7 +21,7 @@ trait BlackjackStateTransitionHit { self: BlackjackStateTransition =>
     var foundOpenHand = false
     val newHands = userHands.hands map { hand =>
       val newCards = {
-        if (!foundOpenHand && hand.status == "OPEN") {
+        if (!foundOpenHand && hand.status == BlackjackHandStatus.OPEN) {
           foundOpenHand = true
           val bjCard = blackjackCardDao.findBlackjackCard(nextCard) match {
             case Some(card) => card

@@ -5,17 +5,15 @@ import com.dashcasino.exception.{IllegalRequestException, AuthorizationException
 import com.dashcasino.model._
 
 import argonaut._, Argonaut._
-import com.dashcasino.service.blackjack.commands.{BlackjackHitCommand, BlackjackGetCardsCommands, BlackjackBetCommand}
+import com.dashcasino.service.blackjack.commands.{BlackjackStandCommand, BlackjackHitCommand, BlackjackGetCardsCommands, BlackjackBetCommand}
 import com.dashcasino.service.blackjack.logic.BlackjackStateTransition
 
 /**
   * Created by freezing on 1/30/16.
   */
 class BlackjackService(implicit val blackjackGameDao: BlackjackGameSqlDao, blackjackGameStateDao: BlackjackGameStateSqlDao, blackjackCardDao: BlackjackCardSqlDao, blackjackDeckSqlDao: BlackjackDeckSqlDao)
-    extends BlackjackBetCommand with BlackjackGetCardsCommands with BlackjackHitCommand with BlackjackStateTransition {
+    extends BlackjackBetCommand with BlackjackGetCardsCommands with BlackjackHitCommand with BlackjackStateTransition with BlackjackStandCommand {
   def `double-down`(gameId: Int) = ???
-
-  def stand(gameId: Int) = ???
 
   def split(gameId: Int) = ???
 

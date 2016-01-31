@@ -11,7 +11,7 @@ import Argonaut._
 /**
   * Created by freezing on 1/31/16.
   */
-trait BlackjackStateTransition extends BlackjackStateTransitionHit with BlackjackStateTransitionDealerDrawing { self: BlackjackService =>
+trait BlackjackStateTransition extends BlackjackStateTransitionHit with BlackjackStateTransitionDealerDrawing with BlackjackStateTransitionStand { self: BlackjackService =>
   def hideIfNotBlackjack(hand: BlackjackHand): BlackjackHand = {
     isBlackjack(hand.cards) match {
       case true => hand.copy(status = BlackjackHandStatus.BLACKJACK)
@@ -83,6 +83,7 @@ trait BlackjackStateTransition extends BlackjackStateTransitionHit with Blackjac
 
     commandId match {
       case CommandService.BLACKJACK_HIT => nextStateAfterHit(blackjackGameState, deck, userHands, dealerHand, nextCard)
+      case CommandService.BLACKJACK_STAND => nextStateAfterStand(blackjackGameState, userHands)
       case unknownCommand => throw new NotImplementedException(s"Command $unknownCommand hasn't been implemented yet!")
     }
   }
