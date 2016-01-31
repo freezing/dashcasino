@@ -2,6 +2,7 @@ package com.dashcasino.service
 
 import com.dashcasino.dao.sql.{BlackjackDeckSqlDao, BlackjackCardSqlDao}
 import com.dashcasino.model._
+import com.sun.javaws.exceptions.InvalidArgumentException
 import spray.util.NotImplementedException
 
 /**
@@ -39,9 +40,22 @@ class BlackjackDeckService(implicit val blackjackDeckDao: BlackjackDeckSqlDao, b
     }
   }
 
-  def getNextState(blackjackGameId: Int, blackjackGameState: BlackjackGameState, commandId: Int): BlackjackGameState = commandId match {
-    case CommandService.BLACKJACK_HIT =>
+  def getNextState(blackjackDeckId: Int, blackjackGameState: BlackjackGameState, commandId: Int): BlackjackGameState = {
+    val deck = blackjackDeckDao.findBlackjackDeck(blackjackDeckId) match {
+      case Some(x) => x
+        // TODO: Email report
+      case None => throw new IllegalArgumentException(s"Invalid blackjackDeckId: $blackjackDeckId")
+    }
+
+    // Draw next card for the given state
+    val card = deck.order
+
+    commandId match {
+      case CommandService.BLACKJACK_HIT =>
+      // Get next card for the given state
+        ???
       // TODO: Implement logic for HIT
-    case unknownCommand => throw new NotImplementedException(s"Command $unknownCommand hasn't been implemented yet!")
+      case unknownCommand => throw new NotImplementedException(s"Command $unknownCommand hasn't been implemented yet!")
+    }
   }
 }
