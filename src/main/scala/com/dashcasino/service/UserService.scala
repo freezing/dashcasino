@@ -3,6 +3,7 @@ package com.dashcasino.service
 import com.dashcasino.model.User
 import com.dashcasino.dao.sql.UserSqlDao
 import com.dashcasino.dao.{DaoStatusCode, ResultCode}
+import com.dashcasino.service.wallet.WalletService
 import scalikejdbc.DB
 
 /**

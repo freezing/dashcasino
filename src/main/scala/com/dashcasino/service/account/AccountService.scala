@@ -1,8 +1,10 @@
-package com.dashcasino.service
+package com.dashcasino.service.account
 
+import com.dashcasino.dao.sql.{AccountSqlDao, TransactionSqlDao}
 import com.dashcasino.dao.{DaoStatusCode, ResultCode}
-import com.dashcasino.dao.sql.{TransactionSqlDao, AccountSqlDao}
 import com.dashcasino.model.{Account, Transaction, User}
+import com.dashcasino.service.CommandService
+import com.dashcasino.service.wallet.WalletService
 
 /**
   * Created by freezing on 1/30/16.

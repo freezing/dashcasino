@@ -1,5 +1,11 @@
 package com.dashcasino
 
+import com.dashcasino.service.account.AccountService
+import com.dashcasino.service.blackjack.{BlackjackService, BlackjackDeckService}
+import com.dashcasino.service.wallet.WalletService
+
+import scala.concurrent.ExecutionContext.Implicits.global
+
 /**
   * Created by freezing on 1/28/16.
   */

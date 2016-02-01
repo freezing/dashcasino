@@ -2,7 +2,8 @@ package com.dashcasino.service.blackjack.logic
 
 import com.dashcasino.dao.sql.{BlackjackCardSqlDao, BlackjackDeckSqlDao}
 import com.dashcasino.model._
-import com.dashcasino.service.{BlackjackService, CommandService}
+import com.dashcasino.service.CommandService
+import com.dashcasino.service.blackjack.BlackjackService
 import spray.util.NotImplementedException
 
 import argonaut._
@@ -84,7 +85,7 @@ trait BlackjackStateTransition extends BlackjackStateTransitionHit with Blackjac
     commandId match {
       case CommandService.BLACKJACK_HIT => nextStateAfterHit(blackjackGameState, deck, userHands, dealerHand, nextCard)
       case CommandService.BLACKJACK_STAND => nextStateAfterStand(blackjackGameState, userHands)
-      case CommandService.BLACKJACK_DOUBLEDOWN => nextStateAfterDoubleDown(blackjackGameState, userHands)
+      //case CommandService.BLACKJACK_DOUBLEDOWN => nextStateAfterDoubleDown(blackjackGameState, userHands)
       case unknownCommand => throw new NotImplementedException(s"Command $unknownCommand hasn't been implemented yet!")
     }
   }

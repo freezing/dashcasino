@@ -3,7 +3,8 @@ package com.dashcasino.service.blackjack.commands
 import com.dashcasino.dao.sql.BlackjackGameStateSqlDao
 import com.dashcasino.exception.CantHitException
 import com.dashcasino.model.{BlackjackHandStatus, BlackjackHand, BlackjackGameState, BlackjackHands}
-import com.dashcasino.service.{BlackjackDeckService, CommandService, BlackjackService}
+import com.dashcasino.service.blackjack.{BlackjackService, BlackjackDeckService}
+import com.dashcasino.service.CommandService
 
 import argonaut._
 import Argonaut._

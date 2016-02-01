@@ -1,7 +1,7 @@
 package com.dashcasino.dao.sql
 
 import com.dashcasino.model.{Account, User}
-import com.dashcasino.service.{WalletService, UserService}
+import com.dashcasino.service.UserService
 import scalikejdbc._
 
 /**

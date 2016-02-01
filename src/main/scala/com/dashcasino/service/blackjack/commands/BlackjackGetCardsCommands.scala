@@ -2,7 +2,7 @@ package com.dashcasino.service.blackjack.commands
 
 import com.dashcasino.dao.sql.BlackjackGameStateSqlDao
 import com.dashcasino.model.{BlackjackHand, BlackjackGameState, BlackjackHands}
-import com.dashcasino.service.{BlackjackDeckService, BlackjackService}
+import com.dashcasino.service.blackjack.{BlackjackService, BlackjackDeckService}
 
 /**
   * Created by freezing on 1/31/16.

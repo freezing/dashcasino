@@ -1,11 +1,11 @@
-package com.dashcasino.service
+package com.dashcasino.service.blackjack
 
+import argonaut.Argonaut._
+import argonaut._
 import com.dashcasino.dao.sql.{BlackjackCardSqlDao, BlackjackDeckSqlDao, BlackjackGameSqlDao, BlackjackGameStateSqlDao}
-import com.dashcasino.exception.{IllegalRequestException, AuthorizationException}
+import com.dashcasino.exception.{AuthorizationException, IllegalRequestException}
 import com.dashcasino.model._
-
-import argonaut._, Argonaut._
-import com.dashcasino.service.blackjack.commands.{BlackjackStandCommand, BlackjackHitCommand, BlackjackGetCardsCommands, BlackjackBetCommand}
+import com.dashcasino.service.blackjack.commands.{BlackjackBetCommand, BlackjackGetCardsCommands, BlackjackHitCommand, BlackjackStandCommand}
 import com.dashcasino.service.blackjack.logic.BlackjackStateTransition
 
 /**

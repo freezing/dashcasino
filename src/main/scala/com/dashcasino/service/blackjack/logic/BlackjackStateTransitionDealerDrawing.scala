@@ -2,7 +2,7 @@ package com.dashcasino.service.blackjack.logic
 
 import com.dashcasino.dao.sql.BlackjackCardSqlDao
 import com.dashcasino.model.{BlackjackHandStatus, BlackjackDeck, BlackjackHand, BlackjackHands}
-import com.dashcasino.service.BlackjackService
+import com.dashcasino.service.blackjack.BlackjackService
 
 /**
   * Created by freezing on 1/31/16.
