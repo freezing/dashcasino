@@ -4,7 +4,8 @@ import akka.actor.Actor
 import com.dashcasino.dao.sql.{BlackjackDeckSqlDao, BlackjackCardSqlDao, BlackjackGameStateSqlDao, BlackjackGameSqlDao}
 import com.dashcasino.exception.{IllegalRequestException, AuthorizationException}
 import com.dashcasino.model._
-import com.dashcasino.service.blackjack.commands.{BlackjackGetCardsCommands, BlackjackStandCommand, BlackjackHitCommand, BlackjackBetCommand}
+import com.dashcasino.service.blackjack._
+import com.dashcasino.service.blackjack.commands._
 import com.dashcasino.service.blackjack.logic.statetransition.BlackjackStateTransition
 
 import argonaut._
@@ -14,9 +15,15 @@ import argonaut.Argonaut._
   * Created by freezing on 2/1/16.
   */
 class BlackjackServiceActor(implicit val blackjackGameDao: BlackjackGameSqlDao, blackjackGameStateDao: BlackjackGameStateSqlDao, blackjackCardDao: BlackjackCardSqlDao, blackjackDeckSqlDao: BlackjackDeckSqlDao)
-  extends Actor with BlackjackStateTransition with BlackjackBetCommand with BlackjackGetCardsCommands with BlackjackHitCommand with BlackjackStandCommand {
+  extends Actor with BlackjackStateTransition with BlackjackBetCommand with BlackjackGetCardsCommands with BlackjackHitCommand with BlackjackStandCommand with BlackjackDoubleDownCommand {
   def receive = {
-    // TODO: BET, STAND, HIT, DOUBLEDOWN, SPLIT, INSURANCE
+    // TODO: SPLIT, INSURANCE
+    case msg: BlackjackBet => sender ! bet(msg)
+    case msg: BlackjackStand => sender ! stand(msg)
+    case msg: BlackjackHit => sender ! hit(msg)
+    case msg: BlackjackDoubleDown => sender ! `double-down`(msg)
+    case msg: BlackjackSplit => throw new NotImplementedError(msg.toString)
+    case msg: BlackjackInsurance => throw new NotImplementedError(msg.toString)
     case unknown => throw new IllegalArgumentException(s"Unknown message: $unknown")
   }
 

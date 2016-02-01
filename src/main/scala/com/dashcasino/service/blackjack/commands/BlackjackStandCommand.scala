@@ -4,7 +4,7 @@ import com.dashcasino.dao.sql.BlackjackGameStateSqlDao
 import com.dashcasino.exception.{CantStandException, CantHitException}
 import com.dashcasino.model.{BlackjackHandStatus, BlackjackHand, BlackjackHands, BlackjackGameState}
 import com.dashcasino.service.CommandService
-import com.dashcasino.service.blackjack.BlackjackService
+import com.dashcasino.service.blackjack.{BlackjackStand, BlackjackService}
 import com.dashcasino.service.blackjack.logic.actor.BlackjackServiceActor
 import sun.plugin.dom.exception.InvalidStateException
 
@@ -15,21 +15,15 @@ import Argonaut._
   * Created by freezing on 1/31/16.
   */
 trait BlackjackStandCommand { self: BlackjackServiceActor =>
-  def stand(userId: Int, gameId: Int)(implicit blackjackGameStateDao: BlackjackGameStateSqlDao, commandService: CommandService) = {
-    // Find game
-    val game = blackjackGameDao.findBlackjackGame(gameId) match {
-      case Some(blackjackGame) => blackjackGame
-      case None => throw new Exception("Couldn't find the game")
-    }
+  def stand(msg: BlackjackStand)(implicit blackjackGameStateDao: BlackjackGameStateSqlDao, commandService: CommandService) = {
+    val (userId, gameId) = BlackjackStand.unapply(msg).get
+
+    val game = blackjackGameDao.findBlackjackGame(gameId).get
 
     checkAuthorization(userId, game)
 
     // Make sure that User can hit
-    val gameState = blackjackGameStateDao.findLastBlackjackGameState(gameId) match {
-      case Some(state) => state
-      case None => throw new Exception("Can't find state for the game")
-    }
-    // TODO: All exceptions that are not regular should be logged somewhere
+    val gameState = blackjackGameStateDao.findLastBlackjackGameState(gameId).get
     if (!canStand(gameState)) throw new CantStandException
 
     // Get next game state and insert it in the database
