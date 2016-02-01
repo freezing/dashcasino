@@ -28,7 +28,7 @@ package object model {
   case class Transaction(id: Int, accountId: Int, amount: BigDecimal, commandId: Int, reason: String, confirmed: Int, timestamp: Long)
   case class BlackjackGame(id: Int, userId: Int, blackjackDeckId: Int, timestamp: Long)
   case class BlackjackGameState(id: Int, gameId: Int, userHand: String, dealerHand: String, description: String, commandId: Int, statusCodeId: Int, timestamp: Long)
-  case class Command(id: Int, name: String)
+  case class Command(id: Int, code: Int, name: String)
   case class StatusCode(id: Int, value: String)
 
   // This card is user only for the blackjack game since it has all the required info for the game
