@@ -10,4 +10,5 @@ package object exception {
   class CantHitException extends Exception("Can't hit in this state")
   class CantStandException extends Exception("Can't stand in this state")
   class IllegalRequestException(message: String) extends Exception(message)
+  class NotEnoughMoneyException(message: String) extends Exception(message)
 }

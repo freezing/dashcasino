@@ -9,9 +9,15 @@ import org.joda.time.DateTime
 class WalletServiceActor extends Actor {
   override def receive = {
     case GenerateNewAddress => sender ! generateNewAddress()
+    case msg: SendMoney => sender ! sendMoney(msg)
   }
 
   private def generateNewAddress() = {
     s"WalletAddress_${DateTime.now().getMillis}"
+  }
+
+  private def sendMoney(msg: SendMoney): Unit = {
+    // TODO: Implement send money via wallet or throw an exception if failed
+    throw new Exception("Send money not implemented yet!")
   }
 }

@@ -7,13 +7,15 @@ import akka.pattern.ask
 import akka.util.Timeout
 import com.dashcasino.service.wallet
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.ExecutionContext.Implicits.global
+
+
 import scala.util.{Failure, Success}
 
 /**
   * Created by freezing on 1/30/16.
   */
-class WalletService(implicit system: ActorSystem, timeout: Timeout, ec: ExecutionContext) {
+class WalletService(implicit system: ActorSystem, timeout: Timeout) {
   // WalletService should have only one Actor for now
   val actor = system.actorOf(Props[WalletServiceActor], name = "walletServiceActor")
 
@@ -29,7 +31,7 @@ class WalletService(implicit system: ActorSystem, timeout: Timeout, ec: Executio
 
   def sendMoney(payoutAddress: String, amount: BigDecimal): Unit = {
     actor ? SendMoney(payoutAddress, amount) onComplete {
-      case Success(value) =>
+      case Success(_) =>
       case Failure(t) => throw t
     }
   }
