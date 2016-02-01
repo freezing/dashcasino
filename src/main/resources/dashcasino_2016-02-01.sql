@@ -7,7 +7,7 @@
 #
 # Host: 33.33.33.10 (MySQL 5.5.47-0ubuntu0.12.04.1)
 # Database: dashcasino
-# Generation Time: 2016-02-01 21:51:18 +0000
+# Generation Time: 2016-02-01 23:33:00 +0000
 # ************************************************************
 
 
@@ -118,6 +118,7 @@ CREATE TABLE `BlackjackGameState` (
   `Description` varchar(200) NOT NULL DEFAULT '',
   `CommandCode` int(11) unsigned NOT NULL DEFAULT '0',
   `StatusCodeId` int(10) unsigned NOT NULL DEFAULT '0',
+  `Insurance` int(11) unsigned DEFAULT '0',
   `Timestamp` datetime NOT NULL,
   PRIMARY KEY (`Id`),
   KEY `fk_blackjackgame` (`GameId`),
