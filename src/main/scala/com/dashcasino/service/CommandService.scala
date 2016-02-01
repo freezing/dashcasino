@@ -13,9 +13,15 @@ class CommandService(implicit val commandDao: CommandSqlDao) {
   val BLACKJACK_STAND = "BLACKJACK_STAND"
   val BLACKJACK_DOUBLEDOWN = "BLACKJACK_DOUBLEDOWN"
 
+  initialize()
+
   def command(name: String) = commandDao.findCommand(name) match {
     case Some(command) => command
     case None => throw new Exception(s"Unknown command: $name")
+  }
+
+  def initialize(): Unit = {
+    // TODO: Read CSV and populate database if command with code doesn't exist
   }
 }
 
