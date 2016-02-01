@@ -3,6 +3,7 @@ package com.dashcasino.service.blackjack.commands
 import com.dashcasino.dao.sql.BlackjackGameStateSqlDao
 import com.dashcasino.exception.CantHitException
 import com.dashcasino.model.{BlackjackHandStatus, BlackjackHand, BlackjackGameState, BlackjackHands}
+import com.dashcasino.service.blackjack.logic.actor.BlackjackServiceActor
 import com.dashcasino.service.blackjack.{BlackjackService, BlackjackDeckService}
 import com.dashcasino.service.CommandService
 
@@ -13,9 +14,9 @@ import sun.plugin.dom.exception.InvalidStateException
 /**
   * Created by freezing on 1/31/16.
   */
-trait BlackjackHitCommand { self: BlackjackService =>
+trait BlackjackHitCommand { self: BlackjackServiceActor =>
   def hit(userId: Int, gameId: Int)
-         (implicit blackjackDeckService: BlackjackDeckService, blackjackGameStateDao: BlackjackGameStateSqlDao): BlackjackHands = {
+         (implicit blackjackDeckService: BlackjackDeckService, blackjackGameStateDao: BlackjackGameStateSqlDao, commandService: CommandService): BlackjackHands = {
     // Find game
     val game = blackjackGameDao.findBlackjackGame(gameId) match {
       case Some(blackjackGame) => blackjackGame
@@ -33,7 +34,7 @@ trait BlackjackHitCommand { self: BlackjackService =>
     if (!canHit(gameState)) throw new CantHitException
 
     // Get next game state and insert it in the database
-    val nextGameState = getNextState(game.blackjackDeckId, gameState, CommandService.BLACKJACK_HIT)
+    val nextGameState = getNextState(game.blackjackDeckId, gameState, commandService.blackjackHit)
     blackjackGameStateDao.insertBlackjackGameState(nextGameState)
 
     // Return user's hands

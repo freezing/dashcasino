@@ -24,7 +24,7 @@ trait ExternalWithdrawalActorLogic { self: AccountServiceActor =>
     // Create transaction and insert it in the database
     val reason = s"{payoutAddress: $payoutAddress, amount: $amount, userId: $userId}"
     // NOTE: Amount is -amount since this transaction withdraws the money from the account
-    val newTransaction = Transaction(-1, account.id, -amount, commandService.EXTERNAL_WITHDRAWAL, reason, NOT_CONFIRMED, -1)
+    val newTransaction = Transaction(-1, account.id, -amount, commandService.externalWithdrawal.code, reason, NOT_CONFIRMED, -1)
     transactionDao.insertTransaction(newTransaction)
 
     // Update account
@@ -34,7 +34,7 @@ trait ExternalWithdrawalActorLogic { self: AccountServiceActor =>
     walletService.sendMoney(payoutAddress, amount)
 
     // Confirm transaction
-    val confirmedTransaction = Transaction(-1, account.id, -amount, commandService.EXTERNAL_WITHDRAWAL, reason, CONFIRMED, -1)
+    val confirmedTransaction = Transaction(-1, account.id, -amount, commandService.externalWithdrawal.code, reason, CONFIRMED, -1)
     transactionDao.insertTransaction(confirmedTransaction)
     true
   }

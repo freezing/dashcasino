@@ -1,18 +1,18 @@
-package com.dashcasino.service.blackjack.logic
+package com.dashcasino.service.blackjack.logic.statetransition
 
+import argonaut.Argonaut._
+import argonaut._
 import com.dashcasino.dao.sql.{BlackjackCardSqlDao, BlackjackDeckSqlDao}
 import com.dashcasino.model._
 import com.dashcasino.service.CommandService
 import com.dashcasino.service.blackjack.BlackjackService
+import com.dashcasino.service.blackjack.logic.actor.BlackjackServiceActor
 import spray.util.NotImplementedException
-
-import argonaut._
-import Argonaut._
 
 /**
   * Created by freezing on 1/31/16.
   */
-trait BlackjackStateTransition extends BlackjackStateTransitionHit with BlackjackStateTransitionDealerDrawing with BlackjackStateTransitionStand with BlackjackStateTransitionDoubleDown { self: BlackjackService =>
+trait BlackjackStateTransition extends BlackjackStateTransitionHit with BlackjackStateTransitionDealerDrawing with BlackjackStateTransitionStand with BlackjackStateTransitionDoubleDown { self: BlackjackServiceActor =>
   def hideIfNotBlackjack(hand: BlackjackHand): BlackjackHand = {
     isBlackjack(hand.cards) match {
       case true => hand.copy(status = BlackjackHandStatus.BLACKJACK)
@@ -58,7 +58,7 @@ trait BlackjackStateTransition extends BlackjackStateTransitionHit with Blackjac
     * @param blackjackCardDao
     * @return Initial BlackjackGameState after the BET is placed.
     */
-  def getInitialState(blackjackDeckId: Int, gameId: Int, money: BigDecimal)(implicit blackjackDeckDao: BlackjackDeckSqlDao, blackjackCardDao: BlackjackCardSqlDao): BlackjackGameState = {
+  def getInitialState(blackjackDeckId: Int, gameId: Int, money: BigDecimal)(implicit blackjackDeckDao: BlackjackDeckSqlDao, blackjackCardDao: BlackjackCardSqlDao, commandService: CommandService): BlackjackGameState = {
     val deck = getDeck(blackjackDeckId)
 
     // User hand is created from cards at indices 0 and 2
@@ -70,10 +70,10 @@ trait BlackjackStateTransition extends BlackjackStateTransitionHit with Blackjac
     val dealerHand = createInitialDealerHand(deck, money)
     val statusCode = 0 // TODO: Figure out what is the status code and if we need it at all
 
-    BlackjackGameState(-1, gameId, userHand.asJson.spaces2, dealerHand.asJson.spaces2, description, CommandService.BLACKJACK_BET, statusCode, -1)
+    BlackjackGameState(-1, gameId, userHand.asJson.spaces2, dealerHand.asJson.spaces2, description, commandService.blackjackBet.code, statusCode, -1)
   }
 
-  def getNextState(blackjackDeckId: Int, blackjackGameState: BlackjackGameState, commandId: Int)
+  def getNextState(blackjackDeckId: Int, blackjackGameState: BlackjackGameState, command: Command)
                   (implicit blackjackDeckDao: BlackjackDeckSqlDao, blackjackCardDao: BlackjackCardSqlDao): BlackjackGameState = {
     val deck = getDeck(blackjackDeckId)
     val dealerHand = decodeDealerHand(blackjackGameState.dealerHand)
@@ -82,7 +82,8 @@ trait BlackjackStateTransition extends BlackjackStateTransitionHit with Blackjac
     // Draw next card for the state
     val nextCard = deck.order.cards(dealerHand.cards.length + userHands.hands.head.cards.length + userHands.hands(1).cards.length)
 
-    commandId match {
+    // TODO: Think of a way to refactor. This is not very nice
+    command.name match {
       case CommandService.BLACKJACK_HIT => nextStateAfterHit(blackjackGameState, deck, userHands, dealerHand, nextCard)
       case CommandService.BLACKJACK_STAND => nextStateAfterStand(blackjackGameState, userHands)
       //case CommandService.BLACKJACK_DOUBLEDOWN => nextStateAfterDoubleDown(blackjackGameState, userHands)

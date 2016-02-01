@@ -1,9 +1,8 @@
-package com.dashcasino.service.blackjack.logic
+package com.dashcasino.service.blackjack.logic.statetransition
 
-import com.dashcasino.model.{BlackjackHandStatus, BlackjackHands, BlackjackGameState}
-
+import argonaut.Argonaut._
 import argonaut._
-import Argonaut._
+import com.dashcasino.model.{BlackjackGameState, BlackjackHandStatus, BlackjackHands}
 
 /**
   * Created by freezing on 1/31/16.

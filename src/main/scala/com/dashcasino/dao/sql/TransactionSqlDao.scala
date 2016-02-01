@@ -8,9 +8,9 @@ import scalikejdbc._
   * Created by freezing on 1/28/16.
   */
 class TransactionSqlDao(implicit val session: AutoSession.type) {
-  def toTransaction(rr: WrappedResultSet) = Transaction(rr.int("Id"), rr.int("AccountId"), rr.bigDecimal("Amount"), rr.int("CommandId"), rr.string("Reason"), rr.int("Confirmed"), rr.time("Timestamp").getTime)
+  def toTransaction(rr: WrappedResultSet) = Transaction(rr.int("Id"), rr.int("AccountId"), rr.bigDecimal("Amount"), rr.int("CommandCode"), rr.string("Reason"), rr.int("Confirmed"), rr.time("Timestamp").getTime)
 
-  def insertTransaction(transaction: Transaction) = sql"INSERT INTO Transaction (AccountId, Amount, CommandId, Reason, Confirmed, Timestamp) VALUES (${transaction.accountId}, ${transaction.amount}, ${transaction.commandId}, ${transaction.reason}, ${transaction.confirmed}, CURRENT_TIMESTAMP)".update().apply()
+  def insertTransaction(transaction: Transaction) = sql"INSERT INTO Transaction (AccountId, Amount, CommandCode, Reason, Confirmed, Timestamp) VALUES (${transaction.accountId}, ${transaction.amount}, ${transaction.commandCode}, ${transaction.reason}, ${transaction.confirmed}, CURRENT_TIMESTAMP)".update().apply()
 
   /**
     * @param accountId

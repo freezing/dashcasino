@@ -1,13 +1,14 @@
-package com.dashcasino.service.blackjack.logic
+package com.dashcasino.service.blackjack.logic.statetransition
 
 import com.dashcasino.dao.sql.BlackjackCardSqlDao
-import com.dashcasino.model.{BlackjackHandStatus, BlackjackDeck, BlackjackHand, BlackjackHands}
+import com.dashcasino.model.{BlackjackDeck, BlackjackHand, BlackjackHandStatus, BlackjackHands}
 import com.dashcasino.service.blackjack.BlackjackService
+import com.dashcasino.service.blackjack.logic.actor.BlackjackServiceActor
 
 /**
   * Created by freezing on 1/31/16.
   */
-trait BlackjackStateTransitionDealerDrawing { self: BlackjackService =>
+trait BlackjackStateTransitionDealerDrawing { self: BlackjackServiceActor =>
   def isGameFinished(userHands: BlackjackHands): Boolean = {
     val nonFinishedHands = userHands.hands collect { case hand if !isHandFinished(hand) => hand}
     nonFinishedHands.isEmpty

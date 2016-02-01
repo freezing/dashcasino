@@ -23,6 +23,14 @@ class CommandService(implicit val commandDao: CommandSqlDao) {
   def initialize(): Unit = {
     // TODO: Read CSV and populate database if command with code doesn't exist
   }
+
+  def blackjackBet = command(BLACKJACK_BET)
+  def blackjackHit = command(BLACKJACK_HIT)
+  def blackjackStand = command(BLACKJACK_STAND)
+  def blackjackDoubleDown = command(BLACKJACK_DOUBLEDOWN)
+
+  def externalWithdrawal = command(EXTERNAL_WITHDRAWAL)
+  def externalDeposit = command(EXTERNAL_DEPOSIT)
 }
 
 object CommandService extends CommandService

@@ -5,6 +5,7 @@ import com.dashcasino.exception.{CantStandException, CantHitException}
 import com.dashcasino.model.{BlackjackHandStatus, BlackjackHand, BlackjackHands, BlackjackGameState}
 import com.dashcasino.service.CommandService
 import com.dashcasino.service.blackjack.BlackjackService
+import com.dashcasino.service.blackjack.logic.actor.BlackjackServiceActor
 import sun.plugin.dom.exception.InvalidStateException
 
 import argonaut._
@@ -13,8 +14,8 @@ import Argonaut._
 /**
   * Created by freezing on 1/31/16.
   */
-trait BlackjackStandCommand { self: BlackjackService =>
-  def stand(userId: Int, gameId: Int)(implicit blackjackGameStateDao: BlackjackGameStateSqlDao) = {
+trait BlackjackStandCommand { self: BlackjackServiceActor =>
+  def stand(userId: Int, gameId: Int)(implicit blackjackGameStateDao: BlackjackGameStateSqlDao, commandService: CommandService) = {
     // Find game
     val game = blackjackGameDao.findBlackjackGame(gameId) match {
       case Some(blackjackGame) => blackjackGame
@@ -32,7 +33,7 @@ trait BlackjackStandCommand { self: BlackjackService =>
     if (!canStand(gameState)) throw new CantStandException
 
     // Get next game state and insert it in the database
-    val nextGameState = getNextState(game.blackjackDeckId, gameState, CommandService.BLACKJACK_STAND)
+    val nextGameState = getNextState(game.blackjackDeckId, gameState, commandService.blackjackStand)
     blackjackGameStateDao.insertBlackjackGameState(nextGameState)
 
     // Return user's hands

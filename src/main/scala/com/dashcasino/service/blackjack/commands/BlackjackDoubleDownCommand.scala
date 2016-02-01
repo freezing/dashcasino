@@ -3,15 +3,16 @@ package com.dashcasino.service.blackjack.commands
 import com.dashcasino.dao.sql.BlackjackGameStateSqlDao
 import com.dashcasino.exception.CantHitException
 import com.dashcasino.model.{BlackjackHands, BlackjackGameState}
+import com.dashcasino.service.blackjack.logic.actor.BlackjackServiceActor
 import com.dashcasino.service.blackjack.{BlackjackService, BlackjackDeckService}
 import com.dashcasino.service.CommandService
 
 /**
   * Created by freezing on 1/31/16.
   */
-trait BlackjackDoubleDownCommand { self: BlackjackService =>
+trait BlackjackDoubleDownCommand { self: BlackjackServiceActor =>
   def `double-down`(userId: Int, gameId: Int)
-    (implicit blackjackDeckService: BlackjackDeckService, blackjackGameStateDao: BlackjackGameStateSqlDao): BlackjackHands = {
+    (implicit blackjackDeckService: BlackjackDeckService, blackjackGameStateDao: BlackjackGameStateSqlDao, commandService: CommandService): BlackjackHands = {
       // Find game
       val game = blackjackGameDao.findBlackjackGame(gameId) match {
         case Some(blackjackGame) => blackjackGame
@@ -30,7 +31,7 @@ trait BlackjackDoubleDownCommand { self: BlackjackService =>
       if (!canDoubleDown(gameState)) throw new CantHitException
 
       // Get next game state and insert it in the database
-      val nextGameState = getNextState(game.blackjackDeckId, gameState, CommandService.BLACKJACK_DOUBLEDOWN)
+      val nextGameState = getNextState(game.blackjackDeckId, gameState, commandService.blackjackDoubleDown)
       blackjackGameStateDao.insertBlackjackGameState(nextGameState)
 
       // Return user's hands
