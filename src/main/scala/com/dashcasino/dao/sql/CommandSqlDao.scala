@@ -19,7 +19,8 @@ class CommandSqlDao(implicit val session: AutoSession.type) {
   def findCommand(name: String): Option[Command] = sql"SELECT * FROM Command WHERE Name=$name".map(toCommand).single().apply()
 
   private def init(): Unit = {
-    scala.io.Source.fromFile(getClass.getResource("commands.csv").toURI.toString).getLines foreach { line =>
+    val filePath = getClass.getResource("commands.csv")
+    scala.io.Source.fromFile(filePath.getFile).getLines foreach { line =>
       val vals = line.split(",")
       val (code, name) = (vals(0).toInt, vals(1))
       val command = Command(-1, code, name)

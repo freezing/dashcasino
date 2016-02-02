@@ -27,3 +27,7 @@
   // Argonaut (JSON library)
   libraryDependencies +=
     "io.argonaut" %% "argonaut" % "6.1"
+
+  libraryDependencies += "org.scalactic" %% "scalactic" % "2.2.6"
+  libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.6" % "test"
+  resolvers += "Artima Maven Repository" at "http://repo.artima.com/releases"

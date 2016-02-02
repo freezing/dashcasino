@@ -8,12 +8,12 @@ import scalikejdbc.{ConnectionPool, LoggingSQLAndTimeSettings, GlobalSettings, A
   */
 package object dao {
   // TODO: Read credentials from config file and enable LIVE and TEST modes
-  // TODO: Instantiate all sql daos as implicit
+  // TODO: Instantiate all com daos as implicit
 
   // initialize JDBC driver & connection pool
   Class.forName("com.mysql.jdbc.Driver")
-  // TODO: Move this to app
-  ConnectionPool.singleton("jdbc:mysql://33.33.33.20:3306/dashcasino", "root", "test")
+  // TODO: USE TEST DATABASE WHEN FIGURED OUT HOW TO SETUP
+  ConnectionPool.singleton("jdbc:mysql://33.33.33.10:3306/dashcasino", "root", "root")
 
   // ad-hoc session provider on the REPL
   implicit val session = AutoSession

@@ -9,7 +9,7 @@ import scalikejdbc.{LoggingSQLAndTimeSettings, GlobalSettings, AutoSession, Conn
   */
 package object dao {
   // TODO: Read credentials from config file and enable LIVE and TEST modes
-  // TODO: Instantiate all sql daos as implicit
+  // TODO: Instantiate all com daos as implicit
 
   // initialize JDBC driver & connection pool
   Class.forName("com.mysql.jdbc.Driver")
