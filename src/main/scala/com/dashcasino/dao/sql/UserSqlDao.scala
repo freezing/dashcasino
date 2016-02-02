@@ -16,14 +16,10 @@ class UserSqlDao(implicit accountSqlDao: AccountSqlDao, session: AutoSession.typ
 
   def findUser(id: Int): Option[User] = sql"SELECT * FROM User WHERE id=$id".map(toUser).single().apply()
 
-  def registerUser(user: User, depositAddress: String) = {
+  def registerUser(user: User) = {
     DB localTx { implicit session =>
       insertUser(user)
-      findUser(user.email) match {
-        case Some(u) => accountSqlDao.insertAccount(Account (- 1, u.id, depositAddress, 0.0))
-        // TODO: Check if this should throw an exception or do something else
-        case None => throw new Exception("Inserted user not found. Strange behaviour!!!")
-      }
+      sql"SELECT * FROM User ORDER BY Id DESC LIMIT 1".map(toUser).single().apply()
     }
   }
 }

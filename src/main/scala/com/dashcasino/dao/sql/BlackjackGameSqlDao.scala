@@ -18,7 +18,7 @@ class BlackjackGameSqlDao(implicit val session: AutoSession.type) {
   def insertBlackjackGame(blackjackGame: BlackjackGame): Option[BlackjackGame] = {
     DB localTx { implicit session =>
       sql"INSERT INTO BlackjackGame (UserId, BlackjackDeckId, Timestamp) VALUES (${blackjackGame.userId}, ${blackjackGame.blackjackDeckId}, CURRENT_TIMESTAMP)".update().apply()
-      sql"SELECT * FROM BlackjackGame ORDER BY Id LIMIT 1".map(toBlackjackGame).single().apply()
+      sql"SELECT * FROM BlackjackGame ORDER BY Id DESC LIMIT 1".map(toBlackjackGame).single().apply()
     }
   }
 

@@ -16,8 +16,8 @@ package object service {
   // Implicit services
   implicit val commandService = new CommandService
   implicit val walletService = new WalletService
-  implicit val userService = new UserService
   implicit val accountService = new AccountService
+  implicit val userService = new UserService
   implicit val blackjackDeckService = new BlackjackDeckService
   implicit val blackjackService = new BlackjackService
 }

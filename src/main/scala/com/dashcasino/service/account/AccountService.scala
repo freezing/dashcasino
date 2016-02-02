@@ -3,6 +3,7 @@ package com.dashcasino.service.account
 import akka.actor.{Props, ActorSystem}
 import akka.util.Timeout
 import akka.pattern.ask
+import com.dashcasino.model.User
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Failure, Success}
@@ -15,6 +16,13 @@ import scala.util.{Failure, Success}
 // TODO: For now it can be one, but it is essential to have more
 class AccountService(implicit system: ActorSystem, timeout: Timeout) {
   val actor = system.actorOf(Props[AccountServiceActor], "accountServiceActor")
+
+  def createAccount(user: User): Unit = {
+    actor ? user onComplete {
+      case Success(_) =>
+      case Failure(t) => throw t
+    }
+  }
 
   def internalDeposit(msg: InternalDeposit): Unit = {
     // TODO: Unit methods will all have the same PartialFunction, it should be GLOBAL
