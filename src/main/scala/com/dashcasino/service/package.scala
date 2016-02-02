@@ -8,16 +8,12 @@ import com.dashcasino.service.wallet.WalletService
   * Created by freezing on 1/28/16.
   */
 package object service {
-  def hash(plain: String): String = {
-    // TODO: Implement a hash function (Use library ofc :D)
-    plain
-  }
-
-  // Implicit services
-  implicit val commandService = new CommandService
-  implicit val walletService = new WalletService
-  implicit val accountService = new AccountService
-  implicit val userService = new UserService
-  implicit val blackjackDeckService = new BlackjackDeckService
-  implicit val blackjackService = new BlackjackService
+  // TODO: Implicit services should only be created in the app, not here, since it is automatically injected in tests
+//  // Implicit services
+//  implicit lazy val commandService = new CommandService
+//  implicit lazy val walletService = new WalletService
+//  implicit lazy val accountService = new AccountService
+//  implicit lazy val userService = new UserService
+//  implicit lazy val blackjackDeckService = new BlackjackDeckService
+//  implicit lazy val blackjackService = new BlackjackService
 }

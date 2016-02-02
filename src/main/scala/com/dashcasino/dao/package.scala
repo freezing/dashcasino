@@ -39,12 +39,12 @@ package object dao {
   case class ResultCode(status: DaoStatusCode.Value, description: String)
 
   // Implicit instances for SqlDao
-  implicit val commandDao = new CommandSqlDao
-  implicit val accountDao = new AccountSqlDao
-  implicit val transactionDao = new TransactionSqlDao
-  implicit val userDao = new UserSqlDao
-  implicit val blackjackCardDao = new BlackjackCardSqlDao
-  implicit val blackjackDeckDao = new BlackjackDeckSqlDao
-  implicit val blackjackGameStateDao = new BlackjackGameStateSqlDao
-  implicit val blackjackGameDao = new BlackjackGameSqlDao
+  implicit lazy val commandDao = new CommandSqlDao
+  implicit lazy val accountDao = new AccountSqlDao
+  implicit lazy val transactionDao = new TransactionSqlDao
+  implicit lazy val userDao = new UserSqlDao
+  implicit lazy val blackjackCardDao = new BlackjackCardSqlDao
+  implicit lazy val blackjackDeckDao = new BlackjackDeckSqlDao
+  implicit lazy val blackjackGameStateDao = new BlackjackGameStateSqlDao
+  implicit lazy val blackjackGameDao = new BlackjackGameSqlDao
 }

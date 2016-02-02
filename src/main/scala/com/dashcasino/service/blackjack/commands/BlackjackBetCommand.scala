@@ -13,7 +13,8 @@ import com.dashcasino.service.CommandService
 trait BlackjackBetCommand { self: BlackjackServiceActor =>
   def bet(msg: BlackjackBet)
          (implicit blackjackDeckService: BlackjackDeckService, blackjackGameStateDao: BlackjackGameStateSqlDao,
-          accountService: AccountService): BlackjackGameState = {
+          blackjackGameDao: BlackjackGameSqlDao,
+          accountService: AccountService, commandService: CommandService): BlackjackGameState = {
     val (userId, blackjackDeckId, amount) = BlackjackBet.unapply(msg).get
     // TODO: Maybe refactor this with throwing exception. It should be thrown on a lower level if something failed.
     blackjackGameDao.insertBlackjackGame(BlackjackGame(-1, userId, blackjackDeckId, -1)) match {

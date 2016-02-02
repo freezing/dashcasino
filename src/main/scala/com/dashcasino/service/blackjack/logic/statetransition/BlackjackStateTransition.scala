@@ -74,7 +74,7 @@ trait BlackjackStateTransition extends BlackjackStateTransitionHit with Blackjac
   }
 
   def getNextState(blackjackDeckId: Int, blackjackGameState: BlackjackGameState, command: Command)
-                  (implicit blackjackDeckDao: BlackjackDeckSqlDao, blackjackCardDao: BlackjackCardSqlDao): BlackjackGameState = {
+                  (implicit blackjackDeckDao: BlackjackDeckSqlDao, blackjackCardDao: BlackjackCardSqlDao, commandService: CommandService): BlackjackGameState = {
     val deck = getDeck(blackjackDeckId)
     val dealerHand = decodeDealerHand(blackjackGameState.dealerHand)
     val userHands = decodeUserHands(blackjackGameState.userHand)

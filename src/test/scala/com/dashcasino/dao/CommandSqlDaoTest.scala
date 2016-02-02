@@ -1,6 +1,6 @@
 package com.dashcasino.dao
 
-import com.dashcasino.service.CommandService
+import com.dashcasino.DashUnitTest
 import org.scalatest._
 
 /**
@@ -8,10 +8,7 @@ import org.scalatest._
   */
 
 // TODO: CHANGE LATER TO BE UNIT TESTS
-class CommandSqlDaoTest extends FlatSpec with Matchers {
-  import com.dashcasino.dao.commandDao
-
-
+class CommandSqlDaoTest extends DashUnitTest {
   val commands = Map(
     0 -> "EXTERNAL_WITHDRAWAL",
     1 -> "EXTERNAL_DEPOSIT",

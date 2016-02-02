@@ -10,16 +10,14 @@ import scalikejdbc._
 class UserSqlDao(implicit accountSqlDao: AccountSqlDao, session: AutoSession.type) {
   def toUser(rr: WrappedResultSet) = User(rr.int("Id"), rr.string("Email"), rr.string("PasswordHash"), rr.time("Timestamp").getTime)
 
-  def insertUser(user: User) = sql"INSERT INTO User (Email, PasswordHash, Timestamp) VALUES (${user.email}, ${user.passwordHash}, CURRENT_TIMESTAMP)".update().apply()
+  private def insertUser(user: User) = sql"INSERT INTO User (Email, PasswordHash, Timestamp) VALUES (${user.email}, ${user.passwordHash}, CURRENT_TIMESTAMP)".update().apply()
 
   def findUser(email: String): Option[User] = sql"SELECT * FROM User WHERE email=$email".map(toUser).single().apply()
 
   def findUser(id: Int): Option[User] = sql"SELECT * FROM User WHERE id=$id".map(toUser).single().apply()
 
   def registerUser(user: User) = {
-    DB localTx { implicit session =>
-      insertUser(user)
-      sql"SELECT * FROM User ORDER BY Id DESC LIMIT 1".map(toUser).single().apply()
-    }
+    insertUser(user)
+    findUser(user.email).get
   }
 }

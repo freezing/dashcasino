@@ -2,10 +2,9 @@ package com.dashcasino.service
 
 import com.dashcasino.model.User
 import com.dashcasino.dao.sql.UserSqlDao
-import com.dashcasino.dao.{DaoStatusCode, ResultCode}
 import com.dashcasino.service.account.AccountService
-import com.dashcasino.service.wallet.WalletService
-import scalikejdbc.DB
+
+import com.github.t3hnar.bcrypt._
 
 /**
   * Created by freezing on 1/27/16.
@@ -13,14 +12,15 @@ import scalikejdbc.DB
 class UserService(implicit userDao: UserSqlDao, accountService: AccountService) {
   // User registration needs WalletService to be able to generate depositAddress
 
-  def registerUser(user: User): Unit = {
-    val registeredUser = userDao.registerUser(user).get
+  def registerUser(user: User): User = {
+    val registeredUser = userDao.registerUser(user.copy(passwordHash = user.passwordHash.bcrypt))
     accountService.createAccount(registeredUser)
+    registeredUser
   }
 
   def checkCredentials(user: User): Boolean = {
     userDao.findUser(user.email) match {
-      case Some(_) => true
+      case Some(u) => user.passwordHash isBcrypted u.passwordHash
       case None => false
     }
   }
