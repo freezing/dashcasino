@@ -1,11 +1,10 @@
 package com.dashcasino
 
 import com.dashcasino.dao.sql._
-import org.h2.mvstore.db.TransactionStore.Transaction
-import scalikejdbc.{LoggingSQLAndTimeSettings, GlobalSettings, AutoSession, ConnectionPool}
+import scalikejdbc.{ConnectionPool, LoggingSQLAndTimeSettings, GlobalSettings, AutoSession}
 
 /**
-  * Created by freezing on 1/28/16.
+  * Created by freezing on 2/2/16.
   */
 package object dao {
   // TODO: Read credentials from config file and enable LIVE and TEST modes
@@ -14,7 +13,7 @@ package object dao {
   // initialize JDBC driver & connection pool
   Class.forName("com.mysql.jdbc.Driver")
   // TODO: Move this to app
-  ConnectionPool.singleton("jdbc:mysql://33.33.33.10:3306/dashcasino", "root", "root")
+  ConnectionPool.singleton("jdbc:mysql://33.33.33.20:3306/dashcasino", "root", "test")
 
   // ad-hoc session provider on the REPL
   implicit val session = AutoSession
