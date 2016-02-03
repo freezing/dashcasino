@@ -7,8 +7,10 @@ import akka.pattern.ask
 import akka.util.Timeout
 import com.dashcasino.service.wallet
 
+import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.duration._
 
 import scala.util.{Failure, Success}
 
@@ -20,19 +22,10 @@ class WalletService(implicit system: ActorSystem, timeout: Timeout) {
   val actor = system.actorOf(Props[WalletServiceActor], name = "walletServiceActor")
 
   def generateDepositAddress: String = {
-    // TODO: Figure out how to do this without var
-    var res = ""
-    actor ? GenerateNewAddress onComplete {
-      case Success(address) => res = address.asInstanceOf[String]
-      case Failure(t) => throw t
-    }
-    res
+    Await.result(actor ? GenerateNewAddress, 5.seconds).asInstanceOf[String]
   }
 
   def sendMoney(payoutAddress: String, amount: BigDecimal): Unit = {
-    actor ? SendMoney(payoutAddress, amount) onComplete {
-      case Success(_) =>
-      case Failure(t) => throw t
-    }
+    Await.result(actor ? SendMoney(payoutAddress, amount), 30.seconds)
   }
 }

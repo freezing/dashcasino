@@ -17,10 +17,6 @@ class DashUnitTest extends FlatSpec with Matchers {
   // TODO: Instantiate all com daos as implicit
 
   class WalletTestService extends WalletService {
-    override def generateDepositAddress: String = {
-      return "Address_" + TimeUtil.
-    }
-
     override def sendMoney(payoutAddress: String, amount: BigDecimal): Unit = {
       // We don't want to send any money while in unit tests.
       // Maybe in future if we setup test wallet service
