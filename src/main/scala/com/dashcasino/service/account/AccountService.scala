@@ -11,7 +11,7 @@ import com.dashcasino.service.wallet.WalletService
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Await
 import scala.concurrent.duration._
-import scala.util.{Success, Failure}
+import scala.util.{Try, Success, Failure}
 
 /**
   * Created by freezing on 2/1/16.
@@ -22,7 +22,7 @@ import scala.util.{Success, Failure}
 class AccountService(implicit system: ActorSystem, timeout: Timeout, walletService: WalletService, commandService: CommandService, transactionSqlDao: TransactionSqlDao, accountSqlDao: AccountSqlDao) {
   val actor = system.actorOf(Props(new AccountServiceActor))
 
-  def defaultHandle(a: Try) = a match {
+  def defaultHandle(a: Any) = a match {
     case Success(_) =>
     case Failure(t) => throw t
   }
