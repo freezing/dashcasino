@@ -1,8 +1,7 @@
 package com.dashcasino.service.account.logic
 
 import com.dashcasino.dao.sql.TransactionSqlDao
-import com.dashcasino.dao.{DaoStatusCode, ResultCode}
-import com.dashcasino.model.{Transaction, User}
+import com.dashcasino.model.Transaction
 import com.dashcasino.service.CommandService
 import com.dashcasino.service.account.{ExternalWithdrawal, AccountServiceActor}
 import com.dashcasino.service.wallet.WalletService

@@ -9,6 +9,8 @@ import com.dashcasino.service.CommandService
 import com.dashcasino.service.account.logic._
 import com.dashcasino.service.wallet.WalletService
 
+import scala.util.Try
+
 /**
   * Created by freezing on 1/30/16.
   */
@@ -21,8 +23,10 @@ class AccountServiceActor(implicit val accountDao: AccountSqlDao, transactionDao
   val CONFIRMED = 1
 
   // TODO: Maybe use amount - EPS?
-  protected def checkMoney(account: Account, amount: BigDecimal) = {
-    if (account.amount < amount) throw new NotEnoughMoneyException(s"Not enough money: ${account.amount}")
+  protected def checkMoney(account: Account, amount: BigDecimal): Unit = {
+    if (account.amount < amount) {
+      throw new NotEnoughMoneyException(s"Not enough money: ${account.amount}")
+    }
   }
 
   protected def internalUpdate(account: Account, amount: BigDecimal, reason: String) = {
@@ -37,11 +41,12 @@ class AccountServiceActor(implicit val accountDao: AccountSqlDao, transactionDao
   }
 
   def receive = {
-    case msg: InternalWithdrawal => sender ! internalWithdrawal(msg)
-    case msg: InternalDeposit => sender ! internalDeposit(msg)
-    case msg: ExternalWithdrawal => sender ! externalWithdrawal(msg)
-    case msg: ExternalDeposit => sender ! externalDeposit(msg)
-    case msg: User => sender ! createAccount(msg)
+    // TODO: Change Try(Something) with sender operator message
+    case msg: InternalWithdrawal => sender ! Try(internalWithdrawal(msg))
+    case msg: InternalDeposit => sender ! Try(internalDeposit(msg))
+    case msg: ExternalWithdrawal => sender ! Try(externalWithdrawal(msg))
+    case msg: ExternalDeposit => sender ! Try(externalDeposit(msg))
+    case msg: User => sender ! Try(createAccount(msg))
     case unknown => throw new IllegalArgumentException(s"Unknown message: $unknown")
   }
 }

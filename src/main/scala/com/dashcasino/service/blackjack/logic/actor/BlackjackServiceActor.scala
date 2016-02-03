@@ -13,6 +13,8 @@ import com.dashcasino.service.blackjack.logic.statetransition.BlackjackStateTran
 import argonaut._
 import argonaut.Argonaut._
 
+import scala.util.Try
+
 /**
   * Created by freezing on 2/1/16.
   */
@@ -20,10 +22,10 @@ class BlackjackServiceActor(implicit val blackjackDeckService: BlackjackDeckServ
   extends Actor with BlackjackStateTransition with BlackjackBetCommand with BlackjackGetCardsCommands with BlackjackHitCommand with BlackjackStandCommand with BlackjackDoubleDownCommand {
   def receive = {
     // TODO: SPLIT, INSURANCE
-    case msg: BlackjackBet => sender ! bet(msg)
-    case msg: BlackjackStand => sender ! stand(msg)
-    case msg: BlackjackHit => sender ! hit(msg)
-    case msg: BlackjackDoubleDown => sender ! `double-down`(msg)
+    case msg: BlackjackBet => sender ! Try(bet(msg))
+    case msg: BlackjackStand => sender ! Try(stand(msg))
+    case msg: BlackjackHit => sender ! Try(hit(msg))
+    case msg: BlackjackDoubleDown => sender ! Try(`double-down`(msg))
     case msg: BlackjackSplit => throw new NotImplementedError(msg.toString)
     case msg: BlackjackInsurance => throw new NotImplementedError(msg.toString)
     case unknown => throw new IllegalArgumentException(s"Unknown message: $unknown")

@@ -65,7 +65,6 @@ class DashUnitTest extends FlatSpec with Matchers {
   def init = {
     // Clear all tables
     import scalikejdbc._
-
     sql"DELETE FROM Transaction".update.apply
     sql"DELETE FROM Account".update.apply
     sql"DELETE FROM User".update.apply

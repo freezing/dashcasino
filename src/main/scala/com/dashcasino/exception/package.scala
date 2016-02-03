@@ -2,6 +2,8 @@ package com.dashcasino
 
 import com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.BIConversion.User
 
+import scala.util.{Failure, Success}
+
 /**
   * Created by freezing on 1/30/16.
   */

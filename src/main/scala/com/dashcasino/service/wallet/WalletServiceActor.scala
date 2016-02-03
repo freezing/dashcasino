@@ -3,13 +3,15 @@ package com.dashcasino.service.wallet
 import akka.actor.Actor
 import org.joda.time.DateTime
 
+import scala.util.Try
+
 /**
   * Created by freezing on 2/1/16.
   */
 class WalletServiceActor extends Actor {
   override def receive = {
-    case GenerateNewAddress => sender ! generateNewAddress()
-    case msg: SendMoney => sender ! sendMoney(msg)
+    case GenerateNewAddress => sender ! Try(generateNewAddress())
+    case msg: SendMoney => sender ! Try(sendMoney(msg))
   }
 
   private def generateNewAddress() = {

@@ -1,6 +1,7 @@
 package com.dashcasino.service
 
 import com.dashcasino.DashUnitTest
+import com.dashcasino.exception.NotEnoughMoneyException
 import com.dashcasino.model.{Transaction, User}
 import com.dashcasino.service.account.{ExternalWithdrawal, InternalWithdrawal, ExternalDeposit, InternalDeposit}
 
@@ -8,14 +9,11 @@ import com.dashcasino.service.account.{ExternalWithdrawal, InternalWithdrawal, E
   * Created by freezing on 2/3/16.
   */
 class AccountServiceTest extends DashUnitTest {
-  lazy val user = userService.registerUser(User(-1, "accountservicetest@gmail.com", "testpass", -1))
-  lazy val accountOption = accountDao.findAccount(user.id)
-
   val NOT_CONFIRMED = 0
   val CONFIRMED = 1
 
   def last2(transactions: List[Transaction]): List[Transaction] = {
-    List(transactions(transactions.length - 2), transactions(transactions.length - 1))
+    List(transactions(transactions.length - 2), transactions.last)
   }
 
   def checkTransaction(transaction: Transaction, accountId: Int, amount: BigDecimal, reason: String, confirmationStatus: Int): Unit = {
@@ -31,6 +29,8 @@ class AccountServiceTest extends DashUnitTest {
   }
 
   "AccountService" should "insert transaction for all methods and update account" in {
+    val user = userService.registerUser(User(-1, "accountservicetest_1@gmail.com", "testpass", -1))
+    val accountOption = accountDao.findAccount(user.id)
     assume(accountOption.isDefined)
 
     val account = accountOption.get
@@ -84,7 +84,21 @@ class AccountServiceTest extends DashUnitTest {
     // Check that last two transactions are NEW and CONFIRMED and correspond to external withdrawal
     checkTransactions(last2(transactionDao.findTransactions(account.id)), account.id, -externalWithdrawalMoney, externalWithdrawalReason)
 
-    // Make sure that there are only 4 transactions
-    transactionDao.findTransactions(account.id).length should be (8) // NEW and CONFIRMED for each
+    // Make sure that there are exactly 4x2=8 transactions (NEW and CONFIRMED for each)
+    transactionDao.findTransactions(account.id).length should be (8)
+  }
+  it should "throw NotEnoughMoneyException if user tries to withdraw (internally) more than what he has" in {
+    intercept[NotEnoughMoneyException] {
+      val user = userService.registerUser(User(-1, "accountservicetest_2@gmail.com", "testpass", -1))
+      val aLotOfMoney = BigDecimal(1000000.0)
+      accountService.internalWithdrawal(InternalWithdrawal(user.id, aLotOfMoney, "NOT IMPORTANT"))
+    }
+  }
+  it should "throw NotEnoughMoneyException if user tries to withdraw (externally) more than what he has" in {
+    intercept[NotEnoughMoneyException] {
+      val user = userService.registerUser(User(-1, "accountservicetest_3@gmail.com", "testpass", -1))
+      val aLotOfMoney = BigDecimal(1000000.0)
+      accountService.externalWithdrawal(ExternalWithdrawal(user.id, "tmp_payout_address", aLotOfMoney))
+    }
   }
 }

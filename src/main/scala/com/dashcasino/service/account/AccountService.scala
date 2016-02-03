@@ -20,25 +20,30 @@ import scala.util.{Success, Failure}
 // TODO: There should be a pool of actors and accounts should be assigned to Actors
 // TODO: For now it can be one, but it is essential to have more
 class AccountService(implicit system: ActorSystem, timeout: Timeout, walletService: WalletService, commandService: CommandService, transactionSqlDao: TransactionSqlDao, accountSqlDao: AccountSqlDao) {
-  val actor = system.actorOf(Props(new AccountServiceActor), "accountServiceActor")
+  val actor = system.actorOf(Props(new AccountServiceActor))
+
+  def defaultHandle(a: Try) = a match {
+    case Success(_) =>
+    case Failure(t) => throw t
+  }
 
   def createAccount(user: User): Unit = {
-    Await.result(actor ? user, 30.seconds)
+    defaultHandle(Await.result(actor ? user, 30.seconds))
   }
 
   def internalDeposit(msg: InternalDeposit): Unit = {
-    Await.result(actor ? msg, 10.seconds)
+    defaultHandle(Await.result(actor ? msg, 10.seconds))
   }
 
   def internalWithdrawal(msg: InternalWithdrawal): Unit = {
-    Await.result(actor ? msg, 10.seconds)
+    defaultHandle(Await.result(actor ? msg, 10.seconds))
   }
 
   def externalDeposit(msg: ExternalDeposit): Unit = {
-    Await.result(actor ? msg, 10.seconds)
+    defaultHandle(Await.result(actor ? msg, 10.seconds))
   }
 
   def externalWithdrawal(msg: ExternalWithdrawal): Unit = {
-    Await.result(actor ? msg, 30.seconds)
+    defaultHandle(Await.result(actor ? msg, 30.seconds))
   }
 }
