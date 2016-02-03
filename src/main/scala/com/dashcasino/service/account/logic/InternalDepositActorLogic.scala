@@ -7,9 +7,9 @@ import com.dashcasino.service.account.{InternalDeposit, AccountServiceActor}
   */
 trait InternalDepositActorLogic { self: AccountServiceActor =>
   def internalDeposit(msg: InternalDeposit): Boolean = {
-    val (userId, gameId, commandId, amount, reason) = InternalDeposit.unapply(msg).get
+    val (userId, amount, reason) = InternalDeposit.unapply(msg).get
     val account = accountDao.findAccount(userId).get
-    internalUpdate(account, gameId, commandId, amount, reason)
+    internalUpdate(account, amount, reason)
     true
   }
 }

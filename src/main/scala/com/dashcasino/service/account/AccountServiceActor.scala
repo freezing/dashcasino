@@ -22,17 +22,17 @@ class AccountServiceActor(implicit val accountDao: AccountSqlDao, transactionDao
 
   // TODO: Maybe use amount - EPS?
   protected def checkMoney(account: Account, amount: BigDecimal) = {
-    if (account.amount > amount) throw new NotEnoughMoneyException(s"Not enough money: ${account.amount}")
+    if (account.amount < amount) throw new NotEnoughMoneyException(s"Not enough money: ${account.amount}")
   }
 
-  protected def internalUpdate(account: Account, gameId: Int, commandId: Int, amount: BigDecimal, reason: String) = {
-    val newTransaction = Transaction(-1, account.id, -amount, commandId, reason, NOT_CONFIRMED, -1)
+  protected def internalUpdate(account: Account, amount: BigDecimal, reason: String) = {
+    val newTransaction = Transaction(-1, account.id, amount, reason, NOT_CONFIRMED, -1)
     transactionDao.insertTransaction(newTransaction)
 
     // Update the account
-    accountDao.updateMoney(account.id, -amount)
+    accountDao.updateMoney(account.id, amount)
 
-    val confirmedTransaction = Transaction(-1, account.id, -amount, commandId, reason, CONFIRMED, -1)
+    val confirmedTransaction = Transaction(-1, account.id, amount, reason, CONFIRMED, -1)
     transactionDao.insertTransaction(confirmedTransaction)
   }
 

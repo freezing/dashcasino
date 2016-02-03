@@ -5,14 +5,8 @@ import akka.actor._
 
 import akka.pattern.ask
 import akka.util.Timeout
-import com.dashcasino.service.wallet
-
 import scala.concurrent.Await
-import scala.concurrent.ExecutionContext.Implicits.global
-
 import scala.concurrent.duration._
-
-import scala.util.{Failure, Success}
 
 /**
   * Created by freezing on 1/30/16.

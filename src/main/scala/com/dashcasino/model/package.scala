@@ -25,7 +25,7 @@ package object model {
   // TODO: Figure out if case classes can use apply methods
   case class User(id: Int, email: String, passwordHash: String, timestamp: Long)
   case class Account(id: Int, userId: Int, depositAddress: String, amount: BigDecimal)
-  case class Transaction(id: Int, accountId: Int, amount: BigDecimal, commandCode: Int, reason: String, confirmed: Int, timestamp: Long)
+  case class Transaction(id: Int, accountId: Int, amount: BigDecimal, reason: String, confirmed: Int, timestamp: Long)
   case class BlackjackGame(id: Int, userId: Int, blackjackDeckId: Int, timestamp: Long)
   case class BlackjackGameState(id: Int, gameId: Int, userHand: String, dealerHand: String, description: String, commandCode: Int, statusCodeId: Int, insurance: Int, timestamp: Long)
   case class Command(id: Int, code: Int, name: String)

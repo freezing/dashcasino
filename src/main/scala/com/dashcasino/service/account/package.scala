@@ -7,8 +7,8 @@ import com.dashcasino.model.User
   */
 package object account {
   // Messages
-  case class InternalWithdrawal(userId: Int, gameId: Int, commandId: Int, amount: BigDecimal, reason: String)
-  case class InternalDeposit(userId: Int, gameId: Int, commandId: Int, amount: BigDecimal, reason: String)
+  case class InternalWithdrawal(userId: Int, amount: BigDecimal, reason: String)
+  case class InternalDeposit(userId: Int, amount: BigDecimal, reason: String)
   case class ExternalWithdrawal(userId: Int, payoutAddress: String, amount: BigDecimal)
   case class ExternalDeposit(userId: Int, amount: BigDecimal, reason: String)
 }

@@ -14,11 +14,7 @@ class AccountSqlDao(implicit val session: AutoSession.type) {
 
   def findAccount(userId: Int): Option[Account] = sql"SELECT * FROM Account WHERE UserId=$userId".map(toAccount).single().apply()
 
-  def updateMoney(accountId: Int, amount: BigDecimal) = {
-    if (amount < 0) {
-      sql"UPDATE Account SET Amount=Amount-${-amount} WHERE AccountId=$accountId".update().apply()
-    } else {
-      sql"UPDATE Account SET Amount=Amount+$amount WHERE AccountId=$accountId".update().apply()
-    }
+  def updateMoney(id: Int, amount: BigDecimal) = {
+    sql"UPDATE Account SET Amount=Amount+${amount.toDouble} WHERE Id=$id".update().apply()
   }
 }

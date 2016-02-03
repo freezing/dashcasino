@@ -14,10 +14,10 @@ trait InternalWithdrawalActorLogic { self: AccountServiceActor =>
   // TODO: Check if Actor can send Unit value to another Actor which means it is a success with no value
   def internalWithdrawal(msg: InternalWithdrawal): Boolean = {
     // TODO: Figure out how to extract case class, something like: a @ (userId, gameId, commandId, amount, reason)
-    val (userId, gameId, commandId, amount, reason) = InternalWithdrawal.unapply(msg).get
+    val (userId, amount, reason) = InternalWithdrawal.unapply(msg).get
     val account = accountDao.findAccount(userId).get
     checkMoney(account, amount)
-    internalUpdate(account, gameId, commandId, -amount, reason)
+    internalUpdate(account, -amount, reason)
     true
   }
 }

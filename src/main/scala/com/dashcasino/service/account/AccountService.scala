@@ -9,7 +9,9 @@ import com.dashcasino.service.CommandService
 import com.dashcasino.service.wallet.WalletService
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.{Failure, Success}
+import scala.concurrent.Await
+import scala.concurrent.duration._
+import scala.util.{Success, Failure}
 
 /**
   * Created by freezing on 2/1/16.
@@ -21,38 +23,22 @@ class AccountService(implicit system: ActorSystem, timeout: Timeout, walletServi
   val actor = system.actorOf(Props(new AccountServiceActor), "accountServiceActor")
 
   def createAccount(user: User): Unit = {
-    actor ? user onComplete {
-      case Success(_) =>
-      case Failure(t) => throw t
-    }
+    Await.result(actor ? user, 30.seconds)
   }
 
   def internalDeposit(msg: InternalDeposit): Unit = {
-    // TODO: Unit methods will all have the same PartialFunction, it should be GLOBAL
-    actor ? msg onComplete {
-      case Success(_) =>
-      case Failure(t) => throw t
-    }
+    Await.result(actor ? msg, 10.seconds)
   }
 
   def internalWithdrawal(msg: InternalWithdrawal): Unit = {
-    actor ? msg onComplete {
-      case Success(_) =>
-      case Failure(t) => throw t
-    }
+    Await.result(actor ? msg, 10.seconds)
   }
 
   def externalDeposit(msg: ExternalDeposit): Unit = {
-    actor ? msg onComplete {
-      case Success(_) =>
-      case Failure(t) => throw t
-    }
+    Await.result(actor ? msg, 10.seconds)
   }
 
   def externalWithdrawal(msg: ExternalWithdrawal): Unit = {
-    actor ? msg onComplete {
-      case Success(_) =>
-      case Failure(t) => throw t
-    }
+    Await.result(actor ? msg, 30.seconds)
   }
 }

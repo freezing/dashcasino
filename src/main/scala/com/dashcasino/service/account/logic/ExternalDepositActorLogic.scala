@@ -15,14 +15,13 @@ trait ExternalDepositActorLogic { self: AccountServiceActor =>
     val (userId, amount, reason) = ExternalDeposit.unapply(msg).get
 
     val account = accountDao.findAccount(userId).get
-    checkMoney(account, amount)
 
-    val newTransaction = Transaction(-1, account.id, amount, commandService.externalDeposit.code, reason, NOT_CONFIRMED, -1)
+    val newTransaction = Transaction(-1, account.id, amount, reason, NOT_CONFIRMED, -1)
     transactionDao.insertTransaction(newTransaction)
 
     accountDao.updateMoney(account.id, amount)
 
-    val confirmedTransaction = Transaction(-1, account.id, amount, commandService.externalDeposit.code, reason, CONFIRMED, -1)
+    val confirmedTransaction = Transaction(-1, account.id, amount, reason, CONFIRMED, -1)
     transactionDao.insertTransaction(confirmedTransaction)
     true
   }

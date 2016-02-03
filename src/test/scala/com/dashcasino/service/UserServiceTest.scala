@@ -6,9 +6,10 @@ import com.dashcasino.model.User
 /**
   * Created by freezing on 2/2/16.
   */
+// TODO: User asserts and descriptive messages that say why did the test fail
 class UserServiceTest extends DashUnitTest {
   "UserService" should "register user successfully and create its account" in {
-    val email = "nikolavla@gmail.com"
+    val email = "userservicetest@gmail.com"
     val pass = "testpass"
 
     // Make sure user doesn't exist
