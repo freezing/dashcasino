@@ -86,7 +86,7 @@ trait BlackjackStateTransition extends BlackjackStateTransitionHit with Blackjac
     command.name match {
       case CommandService.BLACKJACK_HIT => nextStateAfterHit(blackjackGameState, deck, userHands, dealerHand, nextCard)
       case CommandService.BLACKJACK_STAND => nextStateAfterStand(blackjackGameState, userHands)
-      //case CommandService.BLACKJACK_DOUBLEDOWN => nextStateAfterDoubleDown(blackjackGameState, userHands)
+      case CommandService.BLACKJACK_DOUBLEDOWN => nextStateAfterDoubleDown(blackjackGameState, deck, userHands, dealerHand, nextCard)
       case unknownCommand => throw new NotImplementedException(s"Command $unknownCommand hasn't been implemented yet!")
     }
   }

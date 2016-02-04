@@ -3,7 +3,7 @@
   scalaVersion := "2.11.7"
 
   // Scalaz dependency
-  libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.2.0"
+  libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.1.0"
 
   // Scalike JDBC dependencies
   libraryDependencies ++= Seq(

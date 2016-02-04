@@ -2,7 +2,7 @@ package com.dashcasino
 
 import com.dashcasino.dao.sql._
 import com.dashcasino.service.blackjack.{BlackjackService, BlackjackDeckService}
-import com.dashcasino.service.{UserService, CommandService}
+import com.dashcasino.service.{StatusCodeService, UserService, CommandService}
 import com.dashcasino.service.account.AccountService
 import com.dashcasino.service.wallet.WalletService
 import com.mysql.jdbc.TimeUtil
@@ -43,7 +43,8 @@ class DashUnitTest extends FlatSpec with Matchers {
   )
 
   // Implicit instances for SqlDao
-  implicit lazy val commandDao = new CommandSqlDao
+  implicit val statusDao = new StatusCodeSqlDao
+  implicit val commandDao = new CommandSqlDao
   implicit lazy val accountDao = new AccountSqlDao
   implicit lazy val transactionDao = new TransactionSqlDao
   implicit lazy val userDao = new UserSqlDao
@@ -53,6 +54,7 @@ class DashUnitTest extends FlatSpec with Matchers {
   implicit lazy val blackjackGameDao = new BlackjackGameSqlDao
 
   // Implicit services
+  implicit lazy val statusService = new StatusCodeService
   implicit lazy val commandService = new CommandService
   implicit lazy val walletService = new WalletTestService
   implicit lazy val accountService = new AccountService
@@ -67,9 +69,9 @@ class DashUnitTest extends FlatSpec with Matchers {
     import scalikejdbc._
     sql"DELETE FROM Transaction".update.apply
     sql"DELETE FROM Account".update.apply
-    sql"DELETE FROM User".update.apply
     sql"DELETE FROM BlackjackGameState".update.apply
     sql"DELETE FROM BlackjackGame".update.apply
     sql"DELETE FROM BlackjackDeck".update.apply
+    sql"DELETE FROM User".update.apply
   }
 }

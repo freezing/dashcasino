@@ -20,8 +20,9 @@ class CommandService(implicit val commandDao: CommandSqlDao) {
     case None => throw new Exception(s"Unknown command: $name")
   }
 
-  def initialize(): Unit = {
+  private def initialize(): Unit = {
     // TODO: Read CSV and populate database if command with code doesn't exist
+    // This is already done in DAO for both commands and statuses but it should be done in services instead
   }
 
   def blackjackBet = command(BLACKJACK_BET)

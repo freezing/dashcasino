@@ -7,7 +7,7 @@
 #
 # Host: 33.33.33.10 (MySQL 5.5.47-0ubuntu0.12.04.1)
 # Database: dashcasino
-# Generation Time: 2016-02-04 19:30:36 +0000
+# Generation Time: 2016-02-04 21:54:40 +0000
 # ************************************************************
 
 
@@ -40,9 +40,8 @@ LOCK TABLES `Account` WRITE;
 
 INSERT INTO `Account` (`Id`, `UserId`, `DepositAddress`, `Amount`)
 VALUES
-	(95,141,'WalletAddress_1454543575043',7.800000),
-	(96,142,'WalletAddress_1454543575216',0.000000),
-	(97,143,'WalletAddress_1454543575302',0.000000);
+	(147,193,'WalletAddress_1454622813121',100.000000),
+	(148,194,'WalletAddress_1454622813769',0.000000);
 
 /*!40000 ALTER TABLE `Account` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -55,18 +54,79 @@ DROP TABLE IF EXISTS `BlackjackCard`;
 
 CREATE TABLE `BlackjackCard` (
   `Id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `Code` int(11) unsigned NOT NULL,
-  `RankCode` int(11) unsigned NOT NULL,
+  `Code` int(11) NOT NULL,
+  `RankCode` int(11) NOT NULL,
   `RankName` varchar(20) NOT NULL,
   `RankLetter` varchar(5) NOT NULL DEFAULT '',
-  `SuitName` int(11) unsigned NOT NULL,
+  `SuitName` varchar(11) NOT NULL DEFAULT '',
   `SuitLetter` varchar(5) NOT NULL DEFAULT '',
-  `SuitCode` int(11) unsigned NOT NULL,
-  `PrimaryValue` int(11) unsigned NOT NULL,
-  `SecondaryValue` int(11) unsigned DEFAULT NULL,
+  `SuitCode` int(11) NOT NULL,
+  `PrimaryValue` int(11) NOT NULL,
+  `SecondaryValue` int(11) DEFAULT NULL,
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+LOCK TABLES `BlackjackCard` WRITE;
+/*!40000 ALTER TABLE `BlackjackCard` DISABLE KEYS */;
+
+INSERT INTO `BlackjackCard` (`Id`, `Code`, `RankCode`, `RankName`, `RankLetter`, `SuitName`, `SuitLetter`, `SuitCode`, `PrimaryValue`, `SecondaryValue`)
+VALUES
+	(1,1,1,'Ace','A','Clubs','C',1,11,1),
+	(2,2,2,'Two','2','Clubs','C',1,2,-1),
+	(3,3,3,'Three','3','Clubs','C',1,3,-1),
+	(4,4,4,'Four','4','Clubs','C',1,4,-1),
+	(5,5,5,'Five','5','Clubs','C',1,5,-1),
+	(6,6,6,'Six','6','Clubs','C',1,6,-1),
+	(7,7,7,'Seven','7','Clubs','C',1,7,-1),
+	(8,8,8,'Eight','8','Clubs','C',1,8,-1),
+	(9,9,9,'Nine','9','Clubs','C',1,9,-1),
+	(10,10,10,'Ten','T','Clubs','C',1,10,-1),
+	(11,11,11,'Jack','J','Clubs','C',1,10,-1),
+	(12,12,12,'Queen','Q','Clubs','C',1,10,-1),
+	(13,13,13,'King','K','Clubs','C',1,10,-1),
+	(14,14,1,'Ace','A','Diamonds','D',1,11,1),
+	(15,15,2,'Two','2','Diamonds','D',1,2,-1),
+	(16,16,3,'Three','3','Diamonds','D',1,3,-1),
+	(17,17,4,'Four','4','Diamonds','D',1,4,-1),
+	(18,18,5,'Five','5','Diamonds','D',1,5,-1),
+	(19,19,6,'Six','6','Diamonds','D',1,6,-1),
+	(20,20,7,'Seven','7','Diamonds','D',1,7,-1),
+	(21,21,8,'Eight','8','Diamonds','D',1,8,-1),
+	(22,22,9,'Nine','9','Diamonds','D',1,9,-1),
+	(23,23,10,'Ten','T','Diamonds','D',1,10,-1),
+	(24,24,11,'Jack','J','Diamonds','D',1,10,-1),
+	(25,25,12,'Queen','Q','Diamonds','D',1,10,-1),
+	(26,26,13,'King','K','Diamonds','D',1,10,-1),
+	(27,27,1,'Ace','A','Hearts','H',1,11,1),
+	(28,28,2,'Two','2','Hearts','H',1,2,-1),
+	(29,29,3,'Three','3','Hearts','H',1,3,-1),
+	(30,30,4,'Four','4','Hearts','H',1,4,-1),
+	(31,31,5,'Five','5','Hearts','H',1,5,-1),
+	(32,32,6,'Six','6','Hearts','H',1,6,-1),
+	(33,33,7,'Seven','7','Hearts','H',1,7,-1),
+	(34,34,8,'Eight','8','Hearts','H',1,8,-1),
+	(35,35,9,'Nine','9','Hearts','H',1,9,-1),
+	(36,36,10,'Ten','T','Hearts','H',1,10,-1),
+	(37,37,11,'Jack','J','Hearts','H',1,10,-1),
+	(38,38,12,'Queen','Q','Hearts','H',1,10,-1),
+	(39,39,13,'King','K','Hearts','H',1,10,-1),
+	(40,40,1,'Ace','A','Spaces','S',1,11,1),
+	(41,41,2,'Two','2','Spaces','S',1,2,-1),
+	(42,42,3,'Three','3','Spaces','S',1,3,-1),
+	(43,43,4,'Four','4','Spaces','S',1,4,-1),
+	(44,44,5,'Five','5','Spaces','S',1,5,-1),
+	(45,45,6,'Six','6','Spaces','S',1,6,-1),
+	(46,46,7,'Seven','7','Spaces','S',1,7,-1),
+	(47,47,8,'Eight','8','Spaces','S',1,8,-1),
+	(48,48,9,'Nine','9','Spaces','S',1,9,-1),
+	(49,49,10,'Ten','T','Spaces','S',1,10,-1),
+	(50,50,11,'Jack','J','Spaces','S',1,10,-1),
+	(51,51,12,'Queen','Q','Spaces','S',1,10,-1),
+	(52,52,13,'King','K','Spaces','S',1,10,-1),
+	(53,0,0,'None','X','None','X',-1,-1,-1);
+
+/*!40000 ALTER TABLE `BlackjackCard` ENABLE KEYS */;
+UNLOCK TABLES;
 
 
 # Dump of table BlackjackDeck
@@ -75,15 +135,25 @@ CREATE TABLE `BlackjackCard` (
 DROP TABLE IF EXISTS `BlackjackDeck`;
 
 CREATE TABLE `BlackjackDeck` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `Id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `Order` varchar(1000) NOT NULL DEFAULT '',
   `ServerSeed` varchar(200) NOT NULL DEFAULT '',
   `ClientSeed` varchar(200) NOT NULL DEFAULT '',
   `IsSigned` tinyint(1) NOT NULL DEFAULT '0',
   `Timestamp` datetime NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+LOCK TABLES `BlackjackDeck` WRITE;
+/*!40000 ALTER TABLE `BlackjackDeck` DISABLE KEYS */;
+
+INSERT INTO `BlackjackDeck` (`Id`, `Order`, `ServerSeed`, `ClientSeed`, `IsSigned`, `Timestamp`)
+VALUES
+	(18,'[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52]','serverseed','clientseed',1,'2016-02-04 21:53:33'),
+	(19,'[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52]','serverseed','clientseed',1,'2016-02-04 21:53:33');
+
+/*!40000 ALTER TABLE `BlackjackDeck` ENABLE KEYS */;
+UNLOCK TABLES;
 
 
 # Dump of table BlackjackGame
@@ -99,13 +169,21 @@ CREATE TABLE `BlackjackGame` (
   `Timestamp` datetime NOT NULL,
   PRIMARY KEY (`Id`),
   KEY `fk_userid` (`UserId`),
-  KEY `fk_status` (`StatusCodeId`),
   KEY `fk_blackjackdeckid` (`BlackjackDeckId`),
   CONSTRAINT `fk_blackjackdeckid` FOREIGN KEY (`BlackjackDeckId`) REFERENCES `BlackjackDeck` (`id`),
-  CONSTRAINT `fk_status` FOREIGN KEY (`StatusCodeId`) REFERENCES `StatusCode` (`Id`),
   CONSTRAINT `fk_userid` FOREIGN KEY (`UserId`) REFERENCES `User` (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+LOCK TABLES `BlackjackGame` WRITE;
+/*!40000 ALTER TABLE `BlackjackGame` DISABLE KEYS */;
+
+INSERT INTO `BlackjackGame` (`Id`, `UserId`, `StatusCodeId`, `BlackjackDeckId`, `Timestamp`)
+VALUES
+	(10,193,0,18,'2016-02-04 21:53:33'),
+	(11,194,0,19,'2016-02-04 21:53:33');
+
+/*!40000 ALTER TABLE `BlackjackGame` ENABLE KEYS */;
+UNLOCK TABLES;
 
 
 # Dump of table BlackjackGameState
@@ -120,16 +198,14 @@ CREATE TABLE `BlackjackGameState` (
   `DealerHand` varchar(2000) NOT NULL DEFAULT '[]',
   `Description` varchar(200) NOT NULL DEFAULT '',
   `CommandCode` int(11) unsigned NOT NULL DEFAULT '0',
-  `StatusCodeId` int(10) unsigned NOT NULL DEFAULT '0',
   `Insurance` int(11) unsigned DEFAULT '0',
   `Timestamp` datetime NOT NULL,
+  `StatusCode` int(11) NOT NULL,
   PRIMARY KEY (`Id`),
   KEY `fk_blackjackgame` (`GameId`),
   KEY `fk_commandcode` (`CommandCode`),
-  KEY `fk_statuscode` (`StatusCodeId`),
   CONSTRAINT `fk_blackjackgame` FOREIGN KEY (`GameId`) REFERENCES `BlackjackGame` (`Id`),
-  CONSTRAINT `fk_commandcode` FOREIGN KEY (`CommandCode`) REFERENCES `Command` (`Code`),
-  CONSTRAINT `fk_statuscode` FOREIGN KEY (`StatusCodeId`) REFERENCES `StatusCode` (`Id`)
+  CONSTRAINT `fk_commandcode` FOREIGN KEY (`CommandCode`) REFERENCES `Command` (`Code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -170,16 +246,20 @@ DROP TABLE IF EXISTS `StatusCode`;
 
 CREATE TABLE `StatusCode` (
   `Id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `Value` varchar(20) NOT NULL DEFAULT 'UNKNOWN',
-  PRIMARY KEY (`Id`)
+  `Value` varchar(50) NOT NULL DEFAULT 'UNKNOWN',
+  `Code` int(11) NOT NULL,
+  PRIMARY KEY (`Id`),
+  UNIQUE KEY `key_code` (`Code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 LOCK TABLES `StatusCode` WRITE;
 /*!40000 ALTER TABLE `StatusCode` DISABLE KEYS */;
 
-INSERT INTO `StatusCode` (`Id`, `Value`)
+INSERT INTO `StatusCode` (`Id`, `Value`, `Code`)
 VALUES
-	(1,'UNKNOWN');
+	(2,'UNKNOWN',0),
+	(3,'BLACKJACK_GAME_RUNNING',1),
+	(4,'BLACKJACK_GAME_FINISHED',2);
 
 /*!40000 ALTER TABLE `StatusCode` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -210,14 +290,8 @@ LOCK TABLES `Transaction` WRITE;
 
 INSERT INTO `Transaction` (`Id`, `AccountId`, `Amount`, `CommandCode`, `Confirmed`, `Timestamp`, `Reason`)
 VALUES
-	(204,95,10.000000,0,0,'2016-02-03 23:52:54','{description: \"User wants to play some blackjack\"}'),
-	(205,95,10.000000,0,1,'2016-02-03 23:52:54','{description: \"User wants to play some blackjack\"}'),
-	(206,95,-4.700000,0,0,'2016-02-03 23:52:54','{CommandName: \"BLACKJACK_BET\"}'),
-	(207,95,-4.700000,0,1,'2016-02-03 23:52:55','{CommandName: \"BLACKJACK_BET\"}'),
-	(208,95,6.000000,0,0,'2016-02-03 23:52:55','{CommandName: \"User WON with BLACKJACK\"}'),
-	(209,95,6.000000,0,1,'2016-02-03 23:52:55','{CommandName: \"User WON with BLACKJACK\"}'),
-	(210,95,-3.500000,0,0,'2016-02-03 23:52:55','{payoutAddress: WalletAddress_1454543575072, amount: 3.5, userId: 141}'),
-	(211,95,-3.500000,0,1,'2016-02-03 23:52:55','{payoutAddress: WalletAddress_1454543575072, amount: 3.5, userId: 141}');
+	(262,147,100.000000,0,0,'2016-02-04 21:53:33','{Description: Lets play some blackjack}'),
+	(263,147,100.000000,0,1,'2016-02-04 21:53:33','{Description: Lets play some blackjack}');
 
 /*!40000 ALTER TABLE `Transaction` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -242,9 +316,8 @@ LOCK TABLES `User` WRITE;
 
 INSERT INTO `User` (`Id`, `Email`, `PasswordHash`, `Timestamp`)
 VALUES
-	(141,'accountservicetest_1@gmail.com','$2a$10$fSdCtKFvcOBhxMzcvdH4I.fn7cH5oc51UXqM9zdpjk8GlApeZ1VTC','2016-02-03 23:52:54'),
-	(142,'accountservicetest_2@gmail.com','$2a$10$Ts1Iqy2yRgzW0Xyc77G5c.Cvj3H6Ktz3D9.gx4XHnubhkNpQ6CN5G','2016-02-03 23:52:55'),
-	(143,'accountservicetest_3@gmail.com','$2a$10$1K9rxUeVuUqnKCiR9cOA6edqXNdY3OPevEKwOAmvWGG83dHtxVOia','2016-02-03 23:52:55');
+	(193,'blackjackservicetest1@gmail.com','$2a$10$VJZ5kzf5LJ8Dx1W3zvlN3OC.rxETvp5uKNegMt8AvujMqEI37mpSm','2016-02-04 21:53:33'),
+	(194,'blackjackservicetest2@gmail.com','$2a$10$04BTFu6Jaia3H9uECnBRsu8GyP1KG7/TMWoYA.G0/mdinzaY2Suq2','2016-02-04 21:53:33');
 
 /*!40000 ALTER TABLE `User` ENABLE KEYS */;
 UNLOCK TABLES;

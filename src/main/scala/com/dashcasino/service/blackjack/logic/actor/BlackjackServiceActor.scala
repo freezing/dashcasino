@@ -43,7 +43,7 @@ class BlackjackServiceActor(implicit val blackjackDeckService: BlackjackDeckServ
   def getDeck(deckId: Int): BlackjackDeck =
     blackjackDeckSqlDao.findBlackjackDeck(deckId) match {
       case Some(x) => x
-      // TODO: Send email report
+      // TODO: Throw invalid blackjack deck exception (it doesn't have to be handled here, it can throw exception on a lower level - i.e. DAO
       case None => throw new IllegalArgumentException(s"Invalid blackjack deck id: $deckId")
     }
 

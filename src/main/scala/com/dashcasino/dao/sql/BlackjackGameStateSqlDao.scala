@@ -11,7 +11,7 @@ class BlackjackGameStateSqlDao(implicit val session: AutoSession.type) {
   def toBlackjackGameState(rr: WrappedResultSet) = BlackjackGameState(rr.int("Id"), rr.int("GameId"), rr.string("UserHand"), rr.string("DealerHand"), rr.string("Description"), rr.int("CommandCode"), rr.int("StatusCodeId"), rr.int("Insurance"), rr.time("Timestamp").getTime)
 
   def insertBlackjackGameState(blackjackGameState: BlackjackGameState) =
-    sql"INSERT INTO BlackjackGameState (GameId, UserHand, DealerHand, Description, CommandCode, StatusCodeId, Insurance, Timestamp) VALUES (${blackjackGameState.gameId}, ${blackjackGameState.userHand}, ${blackjackGameState.dealerHand}, ${blackjackGameState.description}, ${blackjackGameState.commandCode}, ${blackjackGameState.statusCodeId}, ${blackjackGameState.insurance}, CURRENT_TIMESTAMP)".update().apply()
+    sql"INSERT INTO BlackjackGameState (GameId, UserHand, DealerHand, Description, CommandCode, StatusCode, Insurance, Timestamp) VALUES (${blackjackGameState.gameId}, ${blackjackGameState.userHand}, ${blackjackGameState.dealerHand}, ${blackjackGameState.description}, ${blackjackGameState.commandCode}, ${blackjackGameState.statusCode}, ${blackjackGameState.insurance}, CURRENT_TIMESTAMP)".update().apply()
 
   def findLastBlackjackGameState(gameId: Int) = sql"SELECT * FROM BlackjackGameState WHERE GameId=$gameId ORDER BY id DESC LIMIT 1".map(toBlackjackGameState).single().apply()
 }
