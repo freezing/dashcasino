@@ -49,7 +49,8 @@ class BlackjackDeckService(implicit val blackjackDeckSqlDao: BlackjackDeckSqlDao
   // Note that we could use the order but this way we can keep it cleaner since here it is actually created as a whole
   def createSignedDeck(serverSeed: String, clientSeed: String): BlackjackDeck = {
     val initialOrder = initialShuffle(serverSeed)
-    marsenneTwister(initialOrder, serverSeed, clientSeed)
+    val marsenneOrder = marsenneTwister(initialOrder, serverSeed, clientSeed)
+    BlackjackDeck(-1, marsenneOrder, serverSeed, clientSeed, SIGNED, -1)
   }
 
   def marsenneTwister(order: BlackjackDeckOrder, serverSeed: String, clientSeed: String): BlackjackDeckOrder = {
