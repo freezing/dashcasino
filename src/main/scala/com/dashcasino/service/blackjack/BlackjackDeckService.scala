@@ -59,6 +59,6 @@ class BlackjackDeckService(implicit val blackjackDeckSqlDao: BlackjackDeckSqlDao
 
   private def makeSercret(seed: String): String = {
     // TODO: This has to be tested very well and figure out what does it actually do so that any user can create it himself
-    MessageDigest.getInstance("SHA1").digest(seed.getBytes("utf-8")).toString
+    MessageDigest.getInstance("SHA-1").digest(seed.getBytes("utf-8")).toString
   }
 }
