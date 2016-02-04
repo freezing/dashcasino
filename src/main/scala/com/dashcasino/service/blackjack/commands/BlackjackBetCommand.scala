@@ -2,7 +2,7 @@ package com.dashcasino.service.blackjack.commands
 
 import com.dashcasino.dao.sql.{BlackjackGameStateSqlDao, BlackjackGameSqlDao}
 import com.dashcasino.model.{BlackjackGameState, BlackjackGame}
-import com.dashcasino.service.account.AccountService
+import com.dashcasino.service.account.{InternalWithdrawal, AccountService}
 import com.dashcasino.service.blackjack.logic.actor.BlackjackServiceActor
 import com.dashcasino.service.blackjack.{BlackjackBet, BlackjackService, BlackjackDeckService}
 import com.dashcasino.service.CommandService
@@ -19,6 +19,10 @@ trait BlackjackBetCommand { self: BlackjackServiceActor =>
     // TODO: Maybe refactor this with throwing exception. It should be thrown on a lower level if something failed.
     blackjackGameDao.insertBlackjackGame(BlackjackGame(-1, userId, blackjackDeckId, -1)) match {
       case Some(game) =>
+        // Pay for the game
+        val reason = s"{command: BET, amount: $amount}"
+        accountService.internalWithdrawal(InternalWithdrawal(userId, amount, reason))
+
         // Create initial state for the game
         val blackjackGameState = getInitialState(blackjackDeckId, game.id, amount)
         blackjackGameStateDao.insertBlackjackGameState(blackjackGameState)
