@@ -15,11 +15,11 @@ class BlackjackDeckSqlDao(implicit val session: AutoSession.type) {
         // TODO: Send email report
     case None => throw new IllegalStateException(s"Invalid JSON object for BlackjackDeckOrder in database: $json")
   }
-  def toBlackjackDeck(rr: WrappedResultSet) = BlackjackDeck(rr.int("Id"), toBlackjackDeckOrder(rr.string("order")), rr.string("ServerSeed"), rr.string("ClientSeed"))
+  def toBlackjackDeck(rr: WrappedResultSet) = BlackjackDeck(rr.int("Id"), toBlackjackDeckOrder(rr.string("order")), rr.string("ServerSeed"), rr.string("ClientSeed"), rr.boolean("IsSigned"), rr.time("Timestamp").getTime)
 
   def insertBlackjackDeck(blackjackDeck: BlackjackDeck): Option[BlackjackDeck] = {
     DB localTx { implicit session =>
-      sql"INSERT INTO BlackjackDeck (Order, ServerSeed, ClientSeed) VALUES (${blackjackDeck.order.asJson.spaces2}, ${blackjackDeck.serverSeed}, ${blackjackDeck.clientSeed})".update().apply()
+      sql"INSERT INTO BlackjackDeck (Order, ServerSeed, ClientSeed, IsSigned, Timestamp) VALUES (${blackjackDeck.order.asJson.spaces2}, ${blackjackDeck.serverSeed}, ${blackjackDeck.clientSeed}, ${blackjackDeck.isSigned}, CURRENT_TIMESTAMP)".update().apply()
       sql"SELECT * FROM BlackjackDeck ORDER BY Id DESC LIMIT 1".map(toBlackjackDeck).single().apply()
     }
   }

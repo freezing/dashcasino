@@ -13,4 +13,5 @@ package object exception {
   class CantStandException extends Exception("Can't stand in this state")
   class IllegalRequestException(message: String) extends Exception(message)
   class NotEnoughMoneyException(message: String) extends Exception(message)
+  class InvalidServerSeedException extends Exception
 }
