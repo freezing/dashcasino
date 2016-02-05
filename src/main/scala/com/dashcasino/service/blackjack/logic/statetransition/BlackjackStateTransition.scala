@@ -16,6 +16,7 @@ trait BlackjackStateTransition extends BlackjackStateTransitionHit with Blackjac
   def hideIfNotBlackjack(hand: BlackjackHand): BlackjackHand = {
     isBlackjack(hand.cards) match {
       case true => hand.copy(status = BlackjackHandStatus.BLACKJACK)
+        // First card stays hidden, second one is shown
       case false => hand.copy(cards = List(getCard(BlackjackCardCodes.FACE_DOWN), hand.cards(1)))
     }
   }
