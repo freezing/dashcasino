@@ -3,7 +3,7 @@ package com.dashcasino.service.blackjack.commands
 import com.dashcasino.dao.sql.{BlackjackGameSqlDao, BlackjackGameStateSqlDao}
 import com.dashcasino.exception.{CantStandException, CantHitException}
 import com.dashcasino.model.{BlackjackHandStatus, BlackjackHand, BlackjackHands, BlackjackGameState}
-import com.dashcasino.service.CommandService
+import com.dashcasino.service.{StatusCodeService, CommandService}
 import com.dashcasino.service.blackjack.{BlackjackStand, BlackjackService}
 import com.dashcasino.service.blackjack.logic.actor.BlackjackServiceActor
 import sun.plugin.dom.exception.InvalidStateException
@@ -15,7 +15,7 @@ import Argonaut._
   * Created by freezing on 1/31/16.
   */
 trait BlackjackStandCommand { self: BlackjackServiceActor =>
-  def stand(msg: BlackjackStand)(implicit blackjackGameDao: BlackjackGameSqlDao, blackjackGameStateDao: BlackjackGameStateSqlDao, commandService: CommandService) = {
+  def stand(msg: BlackjackStand)(implicit blackjackGameDao: BlackjackGameSqlDao, blackjackGameStateDao: BlackjackGameStateSqlDao, commandService: CommandService, statusCodeService: StatusCodeService) = {
     val (userId, gameId) = BlackjackStand.unapply(msg).get
 
     val game = blackjackGameDao.findBlackjackGame(gameId).get

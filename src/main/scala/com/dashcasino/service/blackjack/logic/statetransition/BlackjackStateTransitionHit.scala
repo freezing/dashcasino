@@ -4,14 +4,14 @@ import argonaut.Argonaut._
 import argonaut._
 import com.dashcasino.dao.sql.BlackjackCardSqlDao
 import com.dashcasino.model._
-import com.dashcasino.service.CommandService
+import com.dashcasino.service.{StatusCodeService, CommandService}
 
 /**
   * Created by freezing on 1/31/16.
   */
 trait BlackjackStateTransitionHit { self: BlackjackStateTransition =>
   def nextStateAfterHit(oldState: BlackjackGameState, deck: BlackjackDeck, userHands: BlackjackHands, dealerHand: BlackjackHand, nextCard: Int)
-                       (implicit blackjackCardDao: BlackjackCardSqlDao, commandService: CommandService): BlackjackGameState = {
+                       (implicit blackjackCardDao: BlackjackCardSqlDao, commandService: CommandService, statusCodeService: StatusCodeService): BlackjackGameState = {
 
     // Find user's hand that is open with priority for the first one
     // TODO: IMPORTANT, REFACTOR THIS CODE SO IT USES SCALA BUILT-IN METHODS INSTEAD OF FOR COMPREHENSION OVER INDICES
@@ -33,21 +33,20 @@ trait BlackjackStateTransitionHit { self: BlackjackStateTransition =>
       }
       // Update cards, status, money (stays the same)
       val newStatus = {
-        // TODO: Implement logic for status after HIT
-        // If at least one value is open
-        if (isOpen(newCards)) BlackjackHandStatus.OPEN
+        if (newCards.isEmpty) BlackjackHandStatus.EMPTY
+        else if (isOpen(newCards)) BlackjackHandStatus.OPEN
         else if (isBusted(newCards)) BlackjackHandStatus.BUSTED
         else BlackjackHandStatus.STANDING // THIS IS THE CASE WHEN HAND VALUE IS 21 EXACTLY
       }
       hand.copy(cards = newCards, status = newStatus)
     }
     val newUserBlackjackHands = BlackjackHands(newHands)
-    // TODO: UPDATE STATUS CODE
+    val statusCode = getGameStatus(newUserBlackjackHands).code
 
     val newDealerHand = {
       if (isGameFinished(newUserBlackjackHands)) getFinalDealerHand(newUserBlackjackHands, dealerHand, deck)
       else dealerHand
     }
-    oldState.copy(userHand = newUserBlackjackHands, dealerHand = newDealerHand, commandCode = commandService.blackjackHit.code)
+    oldState.copy(userHand = newUserBlackjackHands, dealerHand = newDealerHand, commandCode = commandService.blackjackHit.code, statusCode = statusCode)
   }
 }

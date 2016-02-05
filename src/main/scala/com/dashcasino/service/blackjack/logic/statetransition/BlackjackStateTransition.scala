@@ -4,7 +4,7 @@ import argonaut.Argonaut._
 import argonaut._
 import com.dashcasino.dao.sql.{BlackjackCardSqlDao, BlackjackDeckSqlDao}
 import com.dashcasino.model._
-import com.dashcasino.service.CommandService
+import com.dashcasino.service.{StatusCodeService, CommandService}
 import com.dashcasino.service.blackjack.BlackjackService
 import com.dashcasino.service.blackjack.logic.actor.BlackjackServiceActor
 import spray.util.NotImplementedException
@@ -17,17 +17,17 @@ trait BlackjackStateTransition extends BlackjackStateTransitionHit with Blackjac
     isBlackjack(hand.cards) match {
       case true => hand.copy(status = BlackjackHandStatus.BLACKJACK)
         // First card stays hidden, second one is shown
-      case false => hand.copy(cards = List(getCard(BlackjackCardCodes.FACE_DOWN), hand.cards(1)))
+      case false => hand.copy(cards = List(getCard(BlackjackCardCodes.FACE_DOWN), hand.cards(1)), status = BlackjackHandStatus.DEALER)
     }
   }
 
   def drawCard(hand: BlackjackHand, card: BlackjackCard): BlackjackHand = {
     val newCards = hand.cards ++ List(card)
-    val status = getStatus(newCards)
+    val status = getHandStatus(newCards)
     hand.copy(cards = newCards, status = status)
   }
 
-  def getStatus(cards: List[BlackjackCard]) = {
+  def getHandStatus(cards: List[BlackjackCard]) = {
     if (isBlackjack(cards)) BlackjackHandStatus.BLACKJACK
     else if (isOpen(cards)) BlackjackHandStatus.OPEN
     else if (isBusted(cards)) BlackjackHandStatus.BUSTED
@@ -38,7 +38,7 @@ trait BlackjackStateTransition extends BlackjackStateTransitionHit with Blackjac
     val card1 = getCard(firstCardCode)
     val card2 = getCard(secondCardCode)
     val cards = List(card1, card2)
-    BlackjackHand(cards, getStatus(cards), money)
+    BlackjackHand(cards, getHandStatus(cards), money)
   }
 
   def createInitialUserHand(deck: BlackjackDeck, money: BigDecimal): BlackjackHand =
@@ -59,7 +59,7 @@ trait BlackjackStateTransition extends BlackjackStateTransitionHit with Blackjac
     * @param blackjackCardDao
     * @return Initial BlackjackGameState after the BET is placed.
     */
-  def getInitialState(blackjackDeckId: Int, gameId: Int, money: BigDecimal)(implicit blackjackDeckDao: BlackjackDeckSqlDao, blackjackCardDao: BlackjackCardSqlDao, commandService: CommandService): BlackjackGameState = {
+  def getInitialState(blackjackDeckId: Int, gameId: Int, money: BigDecimal)(implicit blackjackDeckDao: BlackjackDeckSqlDao, blackjackCardDao: BlackjackCardSqlDao, commandService: CommandService, statusCodeService: StatusCodeService): BlackjackGameState = {
     val deck = getDeck(blackjackDeckId)
 
     // User hand is created from cards at indices 0 and 2
@@ -69,13 +69,13 @@ trait BlackjackStateTransition extends BlackjackStateTransitionHit with Blackjac
 
     val description = "Nothing for now"
     val dealerHand = createInitialDealerHand(deck, money)
-    val statusCode = 0 // TODO: Figure out what is the status code and if we need it at all
+    val statusCode = statusCodeService.blackjackRoundRunning.code
 
     BlackjackGameState(-1, gameId, userHand, dealerHand, description, commandService.blackjackBet.code, statusCode, 0 /* no insurance at start */, -1)
   }
 
   def getNextState(blackjackDeckId: Int, blackjackGameState: BlackjackGameState, command: Command)
-                  (implicit blackjackDeckDao: BlackjackDeckSqlDao, blackjackCardDao: BlackjackCardSqlDao, commandService: CommandService): BlackjackGameState = {
+                  (implicit blackjackDeckDao: BlackjackDeckSqlDao, blackjackCardDao: BlackjackCardSqlDao, commandService: CommandService, statusCodeService: StatusCodeService): BlackjackGameState = {
     val deck = getDeck(blackjackDeckId)
     val dealerHand = blackjackGameState.dealerHand
     val userHands = blackjackGameState.userHand
@@ -134,4 +134,12 @@ trait BlackjackStateTransition extends BlackjackStateTransitionHit with Blackjac
   }
 
   def isValidValue(value: Int): Boolean = value >= 1 && value <= 11
+
+
+  // TODO: Include more info about the game, such as are there enough cards left or the deck has to be reshuffled, in that case
+  // TODO: game status is BLACKJACK_GAME_FINISHED
+  def getGameStatus(userHands: BlackjackHands)(implicit statusCodeService: StatusCodeService): StatusCode = {
+    if (userHands.hands exists { h => h.status == BlackjackHandStatus.OPEN }) statusCodeService.blackjackRoundRunning
+    else statusCodeService.blackjackRoundFinished
+  }
 }

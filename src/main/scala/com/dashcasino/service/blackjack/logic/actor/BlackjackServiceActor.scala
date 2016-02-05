@@ -4,7 +4,7 @@ import akka.actor.Actor
 import com.dashcasino.dao.sql.{BlackjackDeckSqlDao, BlackjackCardSqlDao, BlackjackGameStateSqlDao, BlackjackGameSqlDao}
 import com.dashcasino.exception.{IllegalRequestException, AuthorizationException}
 import com.dashcasino.model._
-import com.dashcasino.service.CommandService
+import com.dashcasino.service.{StatusCodeService, CommandService}
 import com.dashcasino.service.account.AccountService
 import com.dashcasino.service.blackjack._
 import com.dashcasino.service.blackjack.commands._
@@ -18,7 +18,7 @@ import scala.util.Try
 /**
   * Created by freezing on 2/1/16.
   */
-class BlackjackServiceActor(implicit val blackjackDeckService: BlackjackDeckService, blackjackGameDao: BlackjackGameSqlDao, blackjackGameStateDao: BlackjackGameStateSqlDao, blackjackCardDao: BlackjackCardSqlDao, blackjackDeckSqlDao: BlackjackDeckSqlDao, accountService: AccountService, commandService: CommandService)
+class BlackjackServiceActor(implicit val blackjackDeckService: BlackjackDeckService, blackjackGameDao: BlackjackGameSqlDao, blackjackGameStateDao: BlackjackGameStateSqlDao, blackjackCardDao: BlackjackCardSqlDao, blackjackDeckSqlDao: BlackjackDeckSqlDao, accountService: AccountService, commandService: CommandService, statusCodeService: StatusCodeService)
   extends Actor with BlackjackStateTransition with BlackjackBetCommand with BlackjackHitCommand with BlackjackStandCommand with BlackjackDoubleDownCommand {
   def receive = {
     // TODO: SPLIT, INSURANCE

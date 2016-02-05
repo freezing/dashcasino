@@ -5,14 +5,14 @@ import com.dashcasino.exception.CantHitException
 import com.dashcasino.model.{BlackjackHands, BlackjackGameState}
 import com.dashcasino.service.blackjack.logic.actor.BlackjackServiceActor
 import com.dashcasino.service.blackjack.{BlackjackDoubleDown, BlackjackService, BlackjackDeckService}
-import com.dashcasino.service.CommandService
+import com.dashcasino.service.{StatusCodeService, CommandService}
 
 /**
   * Created by freezing on 1/31/16.
   */
 trait BlackjackDoubleDownCommand { self: BlackjackServiceActor =>
   def `double-down`(msg: BlackjackDoubleDown)
-    (implicit blackjackDeckDao: BlackjackDeckSqlDao, blackjackGameDao: BlackjackGameSqlDao, blackjackGameStateDao: BlackjackGameStateSqlDao, commandService: CommandService): BlackjackHands = {
+    (implicit blackjackDeckDao: BlackjackDeckSqlDao, blackjackGameDao: BlackjackGameSqlDao, blackjackGameStateDao: BlackjackGameStateSqlDao, commandService: CommandService, statusCodeService: StatusCodeService): BlackjackHands = {
       val (userId, gameId) = BlackjackDoubleDown.unapply(msg).get
       val game = blackjackGameDao.findBlackjackGame(gameId).get
 

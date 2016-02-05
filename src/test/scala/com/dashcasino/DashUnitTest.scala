@@ -43,8 +43,8 @@ class DashUnitTest extends FlatSpec with Matchers {
   )
 
   // Implicit instances for SqlDao
-  implicit val statusDao = new StatusCodeSqlDao
-  implicit val commandDao = new CommandSqlDao
+  implicit lazy val statusDao = new StatusCodeSqlDao
+  implicit lazy val commandDao = new CommandSqlDao
   implicit lazy val accountDao = new AccountSqlDao
   implicit lazy val transactionDao = new TransactionSqlDao
   implicit lazy val userDao = new UserSqlDao
@@ -73,5 +73,8 @@ class DashUnitTest extends FlatSpec with Matchers {
     sql"DELETE FROM BlackjackGame".update.apply
     sql"DELETE FROM BlackjackDeck".update.apply
     sql"DELETE FROM User".update.apply
+    sql"DELETE FROM StatusCode".update.apply
+    sql"DELETE FROM Command".update.apply
+    sql"DELETE FROM BlackjackCard".update.apply
   }
 }

@@ -12,7 +12,7 @@ import argonaut._, Argonaut._
 class BlackjackGameStateSqlDao(implicit val session: AutoSession.type) {
   def toBlackjackGameState(rr: WrappedResultSet) = BlackjackGameState(rr.int("Id"), rr.int("GameId"),
     rr.string("UserHand").decodeOption[BlackjackHands].get, rr.string("DealerHand").decodeOption[BlackjackHand].get,
-    rr.string("Description"), rr.int("CommandCode"), rr.int("StatusCodeId"), rr.int("Insurance"), rr.time("Timestamp").getTime)
+    rr.string("Description"), rr.int("CommandCode"), rr.int("StatusCode"), rr.int("Insurance"), rr.time("Timestamp").getTime)
 
   def insertBlackjackGameState(blackjackGameState: BlackjackGameState) =
     sql"INSERT INTO BlackjackGameState (GameId, UserHand, DealerHand, Description, CommandCode, StatusCode, Insurance, Timestamp) VALUES (${blackjackGameState.gameId}, ${blackjackGameState.userHand.asJson.nospaces}, ${blackjackGameState.dealerHand.asJson.nospaces}, ${blackjackGameState.description}, ${blackjackGameState.commandCode}, ${blackjackGameState.statusCode}, ${blackjackGameState.insurance}, CURRENT_TIMESTAMP)".update().apply()

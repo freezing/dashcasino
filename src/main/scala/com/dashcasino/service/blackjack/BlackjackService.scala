@@ -6,7 +6,7 @@ import akka.actor.{ActorRef, Props, ActorSystem}
 import akka.util.Timeout
 import akka.pattern.ask
 import com.dashcasino.model.{BlackjackGame, BlackjackGameState}
-import com.dashcasino.service.CommandService
+import com.dashcasino.service.{StatusCodeService, CommandService}
 import com.dashcasino.service.account.AccountService
 import com.dashcasino.service.blackjack.logic.actor.BlackjackServiceActor
 
@@ -19,7 +19,7 @@ import scala.concurrent.duration._
 /**
   * Created by freezing on 1/30/16.
   */
-class BlackjackService(implicit actorSystem: ActorSystem, timeout: Timeout, blackjackDeckService: BlackjackDeckService, accountService: AccountService, commandService: CommandService) {
+class BlackjackService(implicit actorSystem: ActorSystem, timeout: Timeout, blackjackDeckService: BlackjackDeckService, accountService: AccountService, commandService: CommandService, statusCodeService: StatusCodeService) {
   private val NUMBER_OF_ACTORS = 16
 
   var gameActors = {

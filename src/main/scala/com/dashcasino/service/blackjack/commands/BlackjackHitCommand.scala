@@ -5,7 +5,7 @@ import com.dashcasino.exception.CantHitException
 import com.dashcasino.model.{BlackjackHandStatus, BlackjackHand, BlackjackGameState, BlackjackHands}
 import com.dashcasino.service.blackjack.logic.actor.BlackjackServiceActor
 import com.dashcasino.service.blackjack.{BlackjackHit, BlackjackService, BlackjackDeckService}
-import com.dashcasino.service.CommandService
+import com.dashcasino.service.{StatusCodeService, CommandService}
 
 import argonaut._
 import Argonaut._
@@ -16,7 +16,7 @@ import sun.plugin.dom.exception.InvalidStateException
   */
 trait BlackjackHitCommand { self: BlackjackServiceActor =>
   def hit(msg: BlackjackHit)
-         (implicit blackjackGameDao: BlackjackGameSqlDao, blackjackDeckService: BlackjackDeckService, blackjackGameStateDao: BlackjackGameStateSqlDao, commandService: CommandService): BlackjackHands = {
+         (implicit blackjackGameDao: BlackjackGameSqlDao, blackjackDeckService: BlackjackDeckService, blackjackGameStateDao: BlackjackGameStateSqlDao, commandService: CommandService, statusCodeService: StatusCodeService): BlackjackGameState = {
     val (userId, gameId) = BlackjackHit.unapply(msg).get
     val game = blackjackGameDao.findBlackjackGame(gameId).get
 
@@ -30,8 +30,8 @@ trait BlackjackHitCommand { self: BlackjackServiceActor =>
     val nextGameState = getNextState(game.blackjackDeckId, gameState, commandService.blackjackHit)
     blackjackGameStateDao.insertBlackjackGameState(nextGameState)
 
-    // Return user's hands
-    nextGameState.userHand
+    // Return game state
+    nextGameState
   }
 
   def canHit(gameState: BlackjackGameState): Boolean = {
