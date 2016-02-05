@@ -31,16 +31,12 @@ trait BlackjackStandCommand { self: BlackjackServiceActor =>
     blackjackGameStateDao.insertBlackjackGameState(nextGameState)
 
     // Return user's hands
-    userHands(nextGameState)
+    nextGameState.userHand
   }
 
   // TODO: REFACTOR SINCE CAN STAND AND CAN HIT HAVE THE SAME LOGIC
   def canStand(gameState: BlackjackGameState): Boolean = {
-    gameState.userHand.decodeOption[BlackjackHands] match {
-      case Some(userHand) => userHand.hands exists { hand => canStand(hand) }
-      // TODO: This should never happen, unless invalid JSON is inserted in database, in which case we should send email report and investigate
-      case None => false
-    }
+    gameState.userHand.hands exists { hand => canStand(hand) }
   }
 
   def canStand(hand: BlackjackHand): Boolean = hand.status match {

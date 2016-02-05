@@ -27,7 +27,7 @@ package object model {
   case class Account(id: Int, userId: Int, depositAddress: String, amount: BigDecimal)
   case class Transaction(id: Int, accountId: Int, amount: BigDecimal, reason: String, confirmed: Int, timestamp: Long)
   case class BlackjackGame(id: Int, userId: Int, blackjackDeckId: Int, timestamp: Long)
-  case class BlackjackGameState(id: Int, gameId: Int, userHand: String, dealerHand: String, description: String, commandCode: Int, statusCode: Int, insurance: Int, timestamp: Long)
+  case class BlackjackGameState(id: Int, gameId: Int, userHand: BlackjackHands, dealerHand: BlackjackHand, description: String, commandCode: Int, statusCode: Int, insurance: Int, timestamp: Long)
   case class Command(id: Int, code: Int, name: String)
   case class StatusCode(id: Int, code:Int, value: String)
 

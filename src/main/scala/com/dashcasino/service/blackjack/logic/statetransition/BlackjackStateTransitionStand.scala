@@ -22,6 +22,6 @@ trait BlackjackStateTransitionStand { self: BlackjackStateTransition =>
       }
     }
     val newUserHands = userHands.copy(hands = newHands)
-    blackjackGameState.copy(userHand = newUserHands.asJson.spaces2)
+    blackjackGameState.copy(userHand = newUserHands)
   }
 }

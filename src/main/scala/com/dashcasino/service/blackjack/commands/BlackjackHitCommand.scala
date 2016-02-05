@@ -31,15 +31,11 @@ trait BlackjackHitCommand { self: BlackjackServiceActor =>
     blackjackGameStateDao.insertBlackjackGameState(nextGameState)
 
     // Return user's hands
-    userHands(nextGameState)
+    nextGameState.userHand
   }
 
   def canHit(gameState: BlackjackGameState): Boolean = {
-    gameState.userHand.decodeOption[BlackjackHands] match {
-      case Some(userHand) => userHand.hands exists { hand => canHit(hand) }
-      // TODO: This should never happen, unless invalid JSON is inserted in database, in which case we should send email report and investigate
-      case None => false
-    }
+    gameState.userHand.hands exists { hand => canHit(hand) }
   }
 
   def canHit(hand: BlackjackHand): Boolean = hand.status match {

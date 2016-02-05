@@ -28,7 +28,7 @@ trait BlackjackDoubleDownCommand { self: BlackjackServiceActor =>
       blackjackGameStateDao.insertBlackjackGameState(nextGameState)
 
       // Return user's hands
-      userHands(nextGameState)
+    nextGameState.userHand
   }
 
   // TODO: TO USE DOUBLE DOWN USER MUST WITHDRAW SAME AMOUNT OF MONEY HE BET

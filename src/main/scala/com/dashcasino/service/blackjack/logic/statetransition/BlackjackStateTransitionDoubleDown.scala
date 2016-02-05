@@ -13,7 +13,7 @@ trait BlackjackStateTransitionDoubleDown {  self: BlackjackServiceActor =>
   def nextStateAfterDoubleDown(oldState: BlackjackGameState, deck: BlackjackDeck, userHands: BlackjackHands, dealerHand: BlackjackHand, nextCard: Int)
                        (implicit blackjackCardDao: BlackjackCardSqlDao, commandService: CommandService): BlackjackGameState = {
     val hitState = nextStateAfterHit(oldState, deck, userHands, dealerHand, nextCard)
-    val afterHitUserHands = decodeUserHands(hitState.userHand)
+    val afterHitUserHands = hitState.userHand
 
     if (canStand(hitState)) nextStateAfterStand(hitState, afterHitUserHands, BlackjackHandStatus.DOUBLE_DOWN)
     else hitState // THIS PROBABLY MEANS THAT HAND IS BUSTED

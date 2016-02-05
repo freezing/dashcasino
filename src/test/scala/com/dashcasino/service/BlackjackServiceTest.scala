@@ -21,8 +21,11 @@ class BlackjackServiceTest extends DashUnitTest {
     accountService.externalDeposit(ExternalDeposit(user.id, 100.0, "{Description: Lets play some blackjack}"))
 
     val deck = createNewDeck
-    blackjackService bet BlackjackBet(user.id, deck.id, 10.0)
-    1 should be (1)
+    val startState = blackjackService bet BlackjackBet(user.id, deck.id, 10.0)
+    // Start state should:
+    // - User hand: {1, 3}
+    // - Dealer hand: {2, -1}
+    startState.userHand
   }
   it should "throw an exception NotEnoughMoneyException if use has no money for BET" in {
     intercept[NotEnoughMoneyException] {

@@ -48,6 +48,6 @@ trait BlackjackStateTransitionHit { self: BlackjackStateTransition =>
       if (isGameFinished(newUserBlackjackHands)) getFinalDealerHand(newUserBlackjackHands, dealerHand, deck)
       else dealerHand
     }
-    oldState.copy(userHand = newUserBlackjackHands.asJson.spaces2, dealerHand = newDealerHand.asJson.spaces2, commandCode = commandService.blackjackHit.code)
+    oldState.copy(userHand = newUserBlackjackHands, dealerHand = newDealerHand, commandCode = commandService.blackjackHit.code)
   }
 }

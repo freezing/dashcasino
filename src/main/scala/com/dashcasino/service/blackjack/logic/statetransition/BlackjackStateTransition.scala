@@ -70,14 +70,14 @@ trait BlackjackStateTransition extends BlackjackStateTransitionHit with Blackjac
     val dealerHand = createInitialDealerHand(deck, money)
     val statusCode = 0 // TODO: Figure out what is the status code and if we need it at all
 
-    BlackjackGameState(-1, gameId, userHand.asJson.spaces2, dealerHand.asJson.spaces2, description, commandService.blackjackBet.code, statusCode, 0 /* no insurance at start */, -1)
+    BlackjackGameState(-1, gameId, userHand, dealerHand, description, commandService.blackjackBet.code, statusCode, 0 /* no insurance at start */, -1)
   }
 
   def getNextState(blackjackDeckId: Int, blackjackGameState: BlackjackGameState, command: Command)
                   (implicit blackjackDeckDao: BlackjackDeckSqlDao, blackjackCardDao: BlackjackCardSqlDao, commandService: CommandService): BlackjackGameState = {
     val deck = getDeck(blackjackDeckId)
-    val dealerHand = decodeDealerHand(blackjackGameState.dealerHand)
-    val userHands = decodeUserHands(blackjackGameState.userHand)
+    val dealerHand = blackjackGameState.dealerHand
+    val userHands = blackjackGameState.userHand
 
     // Draw next card for the state
     val nextCard = deck.order.cards(dealerHand.cards.length + userHands.hands.head.cards.length + userHands.hands(1).cards.length)

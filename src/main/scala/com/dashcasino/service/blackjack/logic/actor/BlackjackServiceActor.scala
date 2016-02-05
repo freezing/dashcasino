@@ -19,7 +19,7 @@ import scala.util.Try
   * Created by freezing on 2/1/16.
   */
 class BlackjackServiceActor(implicit val blackjackDeckService: BlackjackDeckService, blackjackGameDao: BlackjackGameSqlDao, blackjackGameStateDao: BlackjackGameStateSqlDao, blackjackCardDao: BlackjackCardSqlDao, blackjackDeckSqlDao: BlackjackDeckSqlDao, accountService: AccountService, commandService: CommandService)
-  extends Actor with BlackjackStateTransition with BlackjackBetCommand with BlackjackGetCardsCommands with BlackjackHitCommand with BlackjackStandCommand with BlackjackDoubleDownCommand {
+  extends Actor with BlackjackStateTransition with BlackjackBetCommand with BlackjackHitCommand with BlackjackStandCommand with BlackjackDoubleDownCommand {
   def receive = {
     // TODO: SPLIT, INSURANCE
     case msg: BlackjackBet => sender ! Try(bet(msg))
