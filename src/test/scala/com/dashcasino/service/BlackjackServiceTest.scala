@@ -48,6 +48,55 @@ class BlackjackServiceTest extends DashUnitTest {
     // Game status should be BLACKJACK_ROUND_RUNNING
     startState.statusCode should be (statusService.blackjackRoundRunning.code)
   }
+  it should "test if blackjack win works" in {
+    val user = userService.registerUser(User(-1, "blackjackservicetest_userwinsafteronehit@gmail.com", "testpass123123", -1))
+    accountService.externalDeposit(ExternalDeposit(user.id, BigDecimal(10.0), "Wanna play some BJ!!!"))
+    val deck = createNewDeckUserWinsBlackjack
+
+    val betAmount = BigDecimal(10.0)
+    val finalState = blackjackService bet BlackjackBet(user.id, deck.id, betAmount)
+    val gameId = finalState.gameId
+
+    // Check that round is over
+    finalState.statusCode should be (statusService.blackjackRoundFinished.code)
+    // Check that user has WON
+    finalState.userHand.hands.head.status should be (BlackjackHandStatus.BLACKJACK)
+    finalState.userHand.hands.last.status should be (BlackjackHandStatus.EMPTY)
+    finalState.userHand.hands.head.outcome should be (BlackjackHandOutcome.WON_BLACKJACK)
+    finalState.userHand.hands.last.outcome should be (BlackjackHandOutcome.PENDING)
+
+    // Check user's and dealer's cards
+    finalState.userHand.hands.head.cardCodes should be (List(1, 10))
+    finalState.userHand.hands.last.cardCodes should be (List())
+    finalState.dealerHand.cardCodes should be (List(0, 4))
+
+    // Check that player has doubled his account balance
+    accountDao.findAccount(user.id).get.amount should be (BigDecimal(25.0))
+  }
+  it should "test if dealer and user blackjack is a tie" in {
+    val user = userService.registerUser(User(-1, "blackjackservicetest_userwinsafteronehit@gmail.com", "testpass123123", -1))
+    accountService.externalDeposit(ExternalDeposit(user.id, BigDecimal(10.0), "Wanna play some BJ!!!"))
+    val deck = createNewDeckBothBlackjacks
+
+    val betAmount = BigDecimal(10.0)
+    val finalState = blackjackService bet BlackjackBet(user.id, deck.id, betAmount)
+
+    // Check that round is over
+    finalState.statusCode should be (statusService.blackjackRoundFinished.code)
+    // Check that user has WON
+    finalState.userHand.hands.head.status should be (BlackjackHandStatus.BLACKJACK)
+    finalState.userHand.hands.last.status should be (BlackjackHandStatus.EMPTY)
+    finalState.userHand.hands.head.outcome should be (BlackjackHandOutcome.TIE)
+    finalState.userHand.hands.last.outcome should be (BlackjackHandOutcome.PENDING)
+
+    // Check user's and dealer's cards
+    finalState.userHand.hands.head.cardCodes should be (List(1, 10))
+    finalState.userHand.hands.last.cardCodes should be (List())
+    finalState.dealerHand.cardCodes should be (List(11, 14))
+
+    // Check that player has doubled his account balance
+    accountDao.findAccount(user.id).get.amount should be (BigDecimal(10.0))
+  }
   it should "test if doubledown win works" in {
     val user = userService.registerUser(User(-1, "blackjackservicetest_userwinsafterdoubledown@gmail.com", "testpass123123", -1))
     accountService.externalDeposit(ExternalDeposit(user.id, BigDecimal(20.0), "Wanna play some BJ!!!"))
@@ -242,6 +291,16 @@ class BlackjackServiceTest extends DashUnitTest {
   def createNewDeckUserWins = blackjackDeckDao.insertBlackjackDeck(BlackjackDeck(-1,
     BlackjackDeckOrder(
       List(1, 4, 8, 3, 2, 5, 6, 7) union (9 to 52).toList
+    ), "serverseed", "clientseed", SIGNED, -1)).get
+
+  def createNewDeckUserWinsBlackjack = blackjackDeckDao.insertBlackjackDeck(BlackjackDeck(-1,
+    BlackjackDeckOrder(
+      List(1, 2, 10, 4, 3, 5, 6, 7, 8, 9) union (11 to 52).toList
+    ), "serverseed", "clientseed", SIGNED, -1)).get
+
+  def createNewDeckBothBlackjacks = blackjackDeckDao.insertBlackjackDeck(BlackjackDeck(-1,
+    BlackjackDeckOrder(
+      List(1, 11, 10, 14, 2, 4, 3, 5, 6, 7, 8, 9, 12, 13) union (15 to 52).toList
     ), "serverseed", "clientseed", SIGNED, -1)).get
 
   implicit class CardCodesEasyAccess(blackjackHand: BlackjackHand) {
