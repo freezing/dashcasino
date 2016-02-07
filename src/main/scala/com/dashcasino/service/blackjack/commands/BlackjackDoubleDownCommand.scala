@@ -1,12 +1,13 @@
 package com.dashcasino.service.blackjack.commands
 
 import com.dashcasino.dao.sql.{BlackjackGameSqlDao, BlackjackDeckSqlDao, BlackjackGameStateSqlDao}
-import com.dashcasino.exception.CantHitException
-import com.dashcasino.model.{BlackjackHands, BlackjackGameState}
+import com.dashcasino.exception.{CantDoubleDownException, CantHitException}
+import com.dashcasino.model.{BlackjackHandStatus, BlackjackHand, BlackjackHands, BlackjackGameState}
 import com.dashcasino.service.account.{InternalWithdrawal, AccountService}
 import com.dashcasino.service.blackjack.logic.actor.BlackjackServiceActor
 import com.dashcasino.service.blackjack.{BlackjackDoubleDown, BlackjackService, BlackjackDeckService}
 import com.dashcasino.service.{StatusCodeService, CommandService}
+import sun.plugin.dom.exception.InvalidStateException
 
 /**
   * Created by freezing on 1/31/16.
@@ -21,8 +22,7 @@ trait BlackjackDoubleDownCommand { self: BlackjackServiceActor =>
 
     // Make sure that User can double down
     val gameState = blackjackGameStateDao.findLastBlackjackGameState(gameId).get
-    // TODO: CantPlayException should be used everywhere
-    if (!canDoubleDown(gameState)) throw new CantHitException
+    if (!canDoubleDown(gameState)) throw new CantDoubleDownException
 
     // Internal withdrawal for double-down
     accountService.internalWithdrawal(InternalWithdrawal(userId, currentUserHand(gameState).money, "{description: DOUBLEDOWN}"))
@@ -33,6 +33,15 @@ trait BlackjackDoubleDownCommand { self: BlackjackServiceActor =>
     processPayment(userId, nextGameState)
   }
 
-  // TODO: TO USE DOUBLE DOWN USER MUST WITHDRAW SAME AMOUNT OF MONEY HE BET
-  def canDoubleDown(state: BlackjackGameState): Boolean = canHit(state)
+  def canDoubleDown(gameState: BlackjackGameState): Boolean = {
+    canDoubleDown(gameState.userHand.hands.head) && gameState.userHand.hands.last.status == BlackjackHandStatus.EMPTY
+  }
+
+  def canDoubleDown(hand: BlackjackHand): Boolean = hand.status match {
+    case BlackjackHandStatus.OPEN => if (hand.cards.length == 2) true else false
+    case BlackjackHandStatus.BUSTED => false
+    case BlackjackHandStatus.DOUBLE_DOWN => false
+    case BlackjackHandStatus.STANDING => false
+    case unknown => throw new InvalidStateException(s"Invalid blackjack hand state: ${hand.status}")
+  }
 }

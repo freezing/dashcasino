@@ -1,7 +1,7 @@
 package com.dashcasino.service
 
 import com.dashcasino.DashUnitTest
-import com.dashcasino.exception.NotEnoughMoneyException
+import com.dashcasino.exception.{CantDoubleDownException, NotEnoughMoneyException}
 import com.dashcasino.model._
 import com.dashcasino.service.account.ExternalDeposit
 import com.dashcasino.service.blackjack.{BlackjackDoubleDown, BlackjackStand, BlackjackHit, BlackjackBet}
@@ -96,6 +96,20 @@ class BlackjackServiceTest extends DashUnitTest {
 
     // Check that player has doubled his account balance
     accountDao.findAccount(user.id).get.amount should be (BigDecimal(10.0))
+  }
+  it should "test no duobledown allowed after hit" in {
+    intercept[CantDoubleDownException] {
+      val user = userService.registerUser(User(-1, "blackjackservicetest_userwinsafterdoubledown@gmail.com", "testpass123123", -1))
+      accountService.externalDeposit(ExternalDeposit(user.id, BigDecimal(20.0), "Wanna play some BJ!!!"))
+      val deck = createNewDeckUserWins
+
+      val betAmount = BigDecimal(10.0)
+      val startState = blackjackService bet BlackjackBet(user.id, deck.id, betAmount)
+      val gameId = startState.gameId
+
+      blackjackService hit BlackjackHit(user.id, gameId)
+      blackjackService doubleDown BlackjackDoubleDown(user.id, gameId)
+    }
   }
   it should "test if doubledown win works" in {
     val user = userService.registerUser(User(-1, "blackjackservicetest_userwinsafterdoubledown@gmail.com", "testpass123123", -1))

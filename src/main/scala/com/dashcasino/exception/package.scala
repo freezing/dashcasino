@@ -14,4 +14,5 @@ package object exception {
   class IllegalRequestException(message: String) extends Exception(message)
   class NotEnoughMoneyException(message: String) extends Exception(message)
   class InvalidServerSeedException extends Exception
+  class CantDoubleDownException extends Exception("Can't doubledown in this state")
 }
