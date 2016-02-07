@@ -19,7 +19,7 @@ trait BlackjackStateTransition extends BlackjackStateTransitionSplit with Blackj
     isBlackjack(hand.cards) match {
       case true => hand.copy(status = BlackjackHandStatus.BLACKJACK)
         // First card stays hidden, second one is shown
-      case false => hand.copy(cards = List(blackjackCardDao.findBlackjackCard(BlackjackCardCodes.FACE_DOWN), hand.cards(1)), status = BlackjackHandStatus.DEALER)
+      case false => hand.copy(cards = List(hand.cards.head, blackjackCardDao.findBlackjackCard(BlackjackCardCodes.FACE_DOWN)), status = BlackjackHandStatus.DEALER)
     }
   }
 

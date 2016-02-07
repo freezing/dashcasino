@@ -15,7 +15,6 @@ class BlackjackServiceTest extends DashUnitTest {
   "Blackjack Service" should "make sure start state is good" in {
     // Register user
     val user = userService.registerUser(User(-1, "blackjackservicetest_startstate@gmail.com", "testpass123", -1))
-    val account = accountDao.findAccount(user.id)
 
     // Deposit some money into account
     accountService.externalDeposit(ExternalDeposit(user.id, 100.0, "{Description: Lets play some blackjack}"))
@@ -42,7 +41,7 @@ class BlackjackServiceTest extends DashUnitTest {
     startState.dealerHand.status should be (BlackjackHandStatus.DEALER)
 
     // - Dealer hand: {2, -1}
-    startState.dealerHand.cardCodes should be (List(0, 4))
+    startState.dealerHand.cardCodes should be (List(2, 0))
 
     startState.commandCode should be (commandService.blackjackBet.code)
     // Game status should be BLACKJACK_ROUND_RUNNING
@@ -131,7 +130,7 @@ class BlackjackServiceTest extends DashUnitTest {
     // Check user's and dealer's cards
     finalState.userHand.hands.head.cardCodes should be (List(1, 10))
     finalState.userHand.hands.last.cardCodes should be (List())
-    finalState.dealerHand.cardCodes should be (List(0, 4))
+    finalState.dealerHand.cardCodes should be (List(2, 0))
 
     // Check that player has doubled his account balance
     accountDao.findAccount(user.id).get.amount should be (BigDecimal(25.0))
@@ -258,7 +257,7 @@ class BlackjackServiceTest extends DashUnitTest {
     startState.dealerHand.status should be (BlackjackHandStatus.DEALER)
 
     // - Dealer hand: {2, -1}
-    startState.dealerHand.cards map { card => card.code } should be (List(0, 4))
+    startState.dealerHand.cards map { card => card.code } should be (List(2, 0))
 
     startState.commandCode should be (commandService.blackjackBet.code)
     // Game status should be BLACKJACK_ROUND_RUNNING
@@ -302,7 +301,7 @@ class BlackjackServiceTest extends DashUnitTest {
     state4.statusCode should be (statusService.blackjackRoundFinished.code)
 
     // Dealer shouldn't even show his card since user BUSTED
-    state4.dealerHand.cardCodes should be (List(0, 4))
+    state4.dealerHand.cardCodes should be (List(2, 0))
 
     // Check that user has lost his money (i.e. nothing was deposited back)
     val newAccountState = accountDao.findAccount(user.id).get
