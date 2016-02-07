@@ -29,9 +29,7 @@ trait BlackjackStandCommand { self: BlackjackServiceActor =>
     // Get next game state and insert it in the database
     val nextGameState = getNextState(game.blackjackDeckId, gameState, commandService.blackjackStand)
     blackjackGameStateDao.insertBlackjackGameState(nextGameState)
-
-    // Return state after hitting the stand
-    nextGameState
+    processPayment(userId, nextGameState)
   }
 
   // TODO: REFACTOR SINCE CAN STAND AND CAN HIT HAVE THE SAME LOGIC

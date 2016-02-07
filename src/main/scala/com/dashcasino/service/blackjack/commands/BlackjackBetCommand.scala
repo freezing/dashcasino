@@ -27,7 +27,7 @@ trait BlackjackBetCommand { self: BlackjackServiceActor =>
         // Create initial state for the game
         val blackjackGameState = getInitialState(blackjackDeckId, game.id, amount)
         blackjackGameStateDao.insertBlackjackGameState(blackjackGameState)
-        blackjackGameState
+        processPayment(userId, blackjackGameState)
       // TODO: Send email report
       case None => throw new Exception("Couldn't create new blackjack game")
     }

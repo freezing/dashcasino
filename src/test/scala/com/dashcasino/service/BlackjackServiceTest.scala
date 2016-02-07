@@ -48,6 +48,34 @@ class BlackjackServiceTest extends DashUnitTest {
     // Game status should be BLACKJACK_ROUND_RUNNING
     startState.statusCode should be (statusService.blackjackRoundRunning.code)
   }
+  it should "test if user earns money after he wins" in {
+    val user = userService.registerUser(User(-1, "blackjackservicetest_userwinsafteronehit@gmail.com", "testpass123123", -1))
+    accountService.externalDeposit(ExternalDeposit(user.id, BigDecimal(10.0), "Wanna play some BJ!!!"))
+    val deck = createNewDeckUserWins
+
+    val betAmount = BigDecimal(10.0)
+    val startState = blackjackService bet BlackjackBet(user.id, deck.id, betAmount)
+    val gameId = startState.gameId
+
+    blackjackService hit BlackjackHit(user.id, gameId)
+    val finalState = blackjackService stand BlackjackStand(user.id, gameId)
+
+    // Check that round is over
+    finalState.statusCode should be (statusService.blackjackRoundFinished.code)
+    // Check that user has WON
+    finalState.userHand.hands.head.status should be (BlackjackHandStatus.STANDING)
+    finalState.userHand.hands.last.status should be (BlackjackHandStatus.EMPTY)
+    finalState.userHand.hands.head.outcome should be (BlackjackHandOutcome.WON)
+    finalState.userHand.hands.last.outcome should be (BlackjackHandOutcome.PENDING)
+
+    // Check user's and dealer's cards
+    finalState.userHand.hands.head.cardCodes should be (List(1, 8, 2))
+    finalState.userHand.hands.last.cardCodes should be (List())
+    finalState.dealerHand.cardCodes should be (List(4, 3, 5, 6))
+
+    // Check that player has doubled his account balance
+    accountDao.findAccount(user.id).get.amount should be (2 * betAmount)
+  }
   it should "work perfectly for this long sanity test" in {
     // Register user
     val user = userService.registerUser(User(-1, "blackjackservicetest_longsanity@gmail.com", "testpass123", -1))
@@ -183,6 +211,11 @@ class BlackjackServiceTest extends DashUnitTest {
   }
 
   def createNewDeck = blackjackDeckDao.insertBlackjackDeck(BlackjackDeck(-1, BlackjackDeckOrder((1 to 52).toList), "serverseed", "clientseed", SIGNED, -1)).get
+
+  def createNewDeckUserWins = blackjackDeckDao.insertBlackjackDeck(BlackjackDeck(-1,
+    BlackjackDeckOrder(
+      List(1, 4, 8, 3, 2, 5, 6, 7) union (9 to 52).toList
+    ), "serverseed", "clientseed", SIGNED, -1)).get
 
   implicit class CardCodesEasyAccess(blackjackHand: BlackjackHand) {
     def cardCodes = blackjackHand.cards map { c => c.code }

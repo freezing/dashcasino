@@ -29,9 +29,7 @@ trait BlackjackHitCommand { self: BlackjackServiceActor =>
     // Get next game state and insert it in the database
     val nextGameState = getNextState(game.blackjackDeckId, gameState, commandService.blackjackHit)
     blackjackGameStateDao.insertBlackjackGameState(nextGameState)
-
-    // Return game state
-    nextGameState
+    processPayment(userId, nextGameState)
   }
 
   def canHit(gameState: BlackjackGameState): Boolean = {

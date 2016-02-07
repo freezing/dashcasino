@@ -5,7 +5,7 @@ import com.dashcasino.dao.sql.{BlackjackDeckSqlDao, BlackjackCardSqlDao, Blackja
 import com.dashcasino.exception.{IllegalRequestException, AuthorizationException}
 import com.dashcasino.model._
 import com.dashcasino.service.{StatusCodeService, CommandService}
-import com.dashcasino.service.account.AccountService
+import com.dashcasino.service.account.{InternalDeposit, AccountService}
 import com.dashcasino.service.blackjack._
 import com.dashcasino.service.blackjack.commands._
 import com.dashcasino.service.blackjack.logic.statetransition.BlackjackStateTransition
@@ -62,5 +62,32 @@ class BlackjackServiceActor(implicit val blackjackDeckService: BlackjackDeckServ
 
   def currentUserHand(state: BlackjackGameState): BlackjackHand = {
     (state.userHand.hands collectFirst { case hand if hand.status == BlackjackHandStatus.OPEN => hand }).head
+  }
+
+  def processPayment(userId: Int, gameState: BlackjackGameState): BlackjackGameState = {
+    val userHand = BlackjackHands(gameState.userHand.hands map { h => processHandPayment(userId, h) })
+    val newGameState = gameState.copy(userHand = userHand)
+    if (newGameState != gameState) {
+      blackjackGameStateDao.insertBlackjackGameState(newGameState)
+    }
+    newGameState
+  }
+
+  def processHandPayment(userId: Int, hand: BlackjackHand): BlackjackHand = {
+    // Check if hand should get any money
+    if (!hand.paymentFinished && hand.outcome != BlackjackHandOutcome.PENDING) {
+      val returnMoney = hand.outcome match {
+        case BlackjackHandOutcome.LOST => BigDecimal(0.0)
+        case BlackjackHandOutcome.TIE => hand.money
+        case BlackjackHandOutcome.WON => hand.money * 2
+          // TODO: Make Blackjack payment ratio dynamic
+        case BlackjackHandOutcome.WON_BLACKJACK => hand.money + hand.money * 3.0 / 2.0
+        case unknown => throw new IllegalStateException(s"Uknown outcome: $unknown")
+      }
+      accountService.internalDeposit(InternalDeposit(userId, returnMoney, "{description: User has won}"))
+      hand.copy(paymentFinished = true)
+    } else {
+      hand
+    }
   }
 }

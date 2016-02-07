@@ -14,25 +14,23 @@ import com.dashcasino.service.{StatusCodeService, CommandService}
 trait BlackjackDoubleDownCommand { self: BlackjackServiceActor =>
   def `double-down`(msg: BlackjackDoubleDown)
     (implicit accountService: AccountService, blackjackGameDao: BlackjackGameSqlDao, blackjackGameStateDao: BlackjackGameStateSqlDao, commandService: CommandService, statusCodeService: StatusCodeService): BlackjackGameState = {
-      val (userId, gameId) = BlackjackDoubleDown.unapply(msg).get
-      val game = blackjackGameDao.findBlackjackGame(gameId).get
+    val (userId, gameId) = BlackjackDoubleDown.unapply(msg).get
+    val game = blackjackGameDao.findBlackjackGame(gameId).get
 
-      checkAuthorization(userId, game)
+    checkAuthorization(userId, game)
 
-      // Make sure that User can double down
-      val gameState = blackjackGameStateDao.findLastBlackjackGameState(gameId).get
-      // TODO: CantPlayException should be used everywhere
-      if (!canDoubleDown(gameState)) throw new CantHitException
+    // Make sure that User can double down
+    val gameState = blackjackGameStateDao.findLastBlackjackGameState(gameId).get
+    // TODO: CantPlayException should be used everywhere
+    if (!canDoubleDown(gameState)) throw new CantHitException
 
-      // Internal withdrawal for double-down
-      accountService.internalWithdrawal(InternalWithdrawal(userId, currentUserHand(gameState).money, "{description: DOUBLEDOWN}"))
+    // Internal withdrawal for double-down
+    accountService.internalWithdrawal(InternalWithdrawal(userId, currentUserHand(gameState).money, "{description: DOUBLEDOWN}"))
 
-      // Get next game state and insert it in the database
-      val nextGameState = getNextState(game.blackjackDeckId, gameState, commandService.blackjackDoubleDown)
-      blackjackGameStateDao.insertBlackjackGameState(nextGameState)
-
-      // Return game state
-    nextGameState
+    // Get next game state and insert it in the database
+    val nextGameState = getNextState(game.blackjackDeckId, gameState, commandService.blackjackDoubleDown)
+    blackjackGameStateDao.insertBlackjackGameState(nextGameState)
+    processPayment(userId, nextGameState)
   }
 
   // TODO: TO USE DOUBLE DOWN USER MUST WITHDRAW SAME AMOUNT OF MONEY HE BET

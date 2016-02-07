@@ -13,6 +13,8 @@ import spray.util.NotImplementedException
   * Created by freezing on 1/31/16.
   */
 trait BlackjackStateTransition extends BlackjackStateTransitionHit with BlackjackStateTransitionDealerDrawing with BlackjackStateTransitionStand with BlackjackStateTransitionDoubleDown { self: BlackjackServiceActor =>
+  val NOT_PAID = false
+
   def hideIfNotBlackjack(hand: BlackjackHand)(implicit blackjackCardDao: BlackjackCardSqlDao): BlackjackHand = {
     isBlackjack(hand.cards) match {
       case true => hand.copy(status = BlackjackHandStatus.BLACKJACK)
@@ -47,14 +49,14 @@ trait BlackjackStateTransition extends BlackjackStateTransitionHit with Blackjac
     val card1 = blackjackCardDao.findBlackjackCard(firstCardCode)
     val card2 = blackjackCardDao.findBlackjackCard(secondCardCode)
     val cards = List(card1, card2)
-    BlackjackHand(cards, getHandStatus(cards), BlackjackHandOutcome.PENDING, money)
+    BlackjackHand(cards, getHandStatus(cards), BlackjackHandOutcome.PENDING, money, NOT_PAID)
   }
 
   def createDealerHand(firstCardCode: Int, secondCardCode: Int, money: BigDecimal)(implicit blackjackCardDao: BlackjackCardSqlDao): BlackjackHand = {
     val card1 = blackjackCardDao.findBlackjackCard(firstCardCode)
     val card2 = blackjackCardDao.findBlackjackCard(secondCardCode)
     val cards = List(card1, card2)
-    BlackjackHand(cards, getDealerHandStatus(cards), BlackjackHandOutcome.PENDING, money)
+    BlackjackHand(cards, getDealerHandStatus(cards), BlackjackHandOutcome.PENDING, money, NOT_PAID)
   }
 
   def createInitialUserHand(deck: BlackjackDeck, money: BigDecimal): BlackjackHand =
@@ -76,16 +78,37 @@ trait BlackjackStateTransition extends BlackjackStateTransitionHit with Blackjac
   def getInitialState(blackjackDeckId: Int, gameId: Int, money: BigDecimal)(implicit blackjackDeckDao: BlackjackDeckSqlDao, blackjackCardDao: BlackjackCardSqlDao, commandService: CommandService, statusCodeService: StatusCodeService): BlackjackGameState = {
     val deck = getDeck(blackjackDeckId)
 
-    // User hand is created from cards at indices 0 and 2
-    val firstUserHand = createInitialUserHand(deck, money)
-    val userBlackjackHands = List(firstUserHand, BlackjackHand(List.empty[BlackjackCard], BlackjackHandStatus.EMPTY, BlackjackHandOutcome.PENDING, 0.0))
-    val userHand = BlackjackHands(userBlackjackHands)
-
+    // Create dealer hand
     val description = "Nothing for now"
     val dealerHand = createInitialDealerHand(deck, money)
-    val statusCode = statusCodeService.blackjackRoundRunning.code
+
+    // User hand is created from cards at indices 0 and 2
+    val firstUserHand = createInitialUserHand(deck, money)
+    val userBlackjackHands = List(firstUserHand, BlackjackHand(List.empty[BlackjackCard], BlackjackHandStatus.EMPTY, BlackjackHandOutcome.PENDING, 0.0, NOT_PAID))
+    val userHand = checkBlackjacks(BlackjackHands(userBlackjackHands), dealerHand)
+
+    val statusCode = getGameStatus(userHand).code
 
     BlackjackGameState(-1, gameId, userHand, dealerHand, description, commandService.blackjackBet.code, statusCode, 0 /* no insurance at start */, -1)
+  }
+
+  def checkBlackjacks(userHands: BlackjackHands, dealerHand: BlackjackHand): BlackjackHands = {
+    if (dealerHand.status == BlackjackHandStatus.BLACKJACK) {
+      // If user has Blackjack, it's a TIE, otherwise user lost
+      userHands.hands.head.status match {
+        case BlackjackHandStatus.BLACKJACK => userInstaUpdate(userHands, BlackjackHandOutcome.TIE)
+        case _ => userInstaUpdate(userHands, BlackjackHandOutcome.LOST)
+      }
+    } else {
+      userHands.hands.head.status match {
+        case BlackjackHandStatus.BLACKJACK => userInstaUpdate(userHands, BlackjackHandOutcome.WON_BLACKJACK)
+        case _ => userHands
+      }
+    }
+  }
+
+  def userInstaUpdate(userHands: BlackjackHands, outcome: String): BlackjackHands = {
+    BlackjackHands(List(userHands.hands.head.copy(outcome = outcome), userHands.hands.last))
   }
 
   def getNextState(blackjackDeckId: Int, blackjackGameState: BlackjackGameState, command: Command)
@@ -141,6 +164,7 @@ trait BlackjackStateTransition extends BlackjackStateTransitionHit with Blackjac
 
   /**
     * Calcultes best hand value from the soft and hard values.
+    *
     * @param handValues
     */
   def bestHandValue(handValues: List[Int]): Int = {

@@ -22,6 +22,7 @@ package object model {
     val TIE = "TIE"
     val WON = "WON"
     val LOST = "LOST"
+    val WON_BLACKJACK = "WON_BLACKJACK"
   }
 
   object BlackjackStatusCodes {
@@ -49,12 +50,12 @@ package object model {
   // Case class format using argonaut, and convert hands to JSON ready string for SQL
 
   // Status can be: OPEN, BUSTED, STANDING, DOUBLE-DOWN (if double-downed but busted it will be BUSTED), BLACKJACK
-  case class BlackjackHand(cards: List[BlackjackCard], status: String, outcome: String, money: BigDecimal)
+  case class BlackjackHand(cards: List[BlackjackCard], status: String, outcome: String, money: BigDecimal, paymentFinished: Boolean)
   case class BlackjackHands(hands: List[BlackjackHand])
 
   // Implicit JSON codec for Argonaut
   implicit def BlackjackDeckOrderCodecJson = casecodec1(BlackjackDeckOrder.apply, BlackjackDeckOrder.unapply)("cards")
   implicit def BlackjackCardCodecJson = casecodec10(BlackjackCard.apply, BlackjackCard.unapply)("id", "code", "rankCode", "rankName", "rankLetter", "suitName", "suitLetter", "suitCode", "primaryValue", "secondaryValue")
-  implicit def BlackjackHandCodecJson = casecodec4(BlackjackHand.apply, BlackjackHand.unapply)("cards", "status", "outcome", "money")
+  implicit def BlackjackHandCodecJson = casecodec5(BlackjackHand.apply, BlackjackHand.unapply)("cards", "status", "outcome", "money", "paymentFinished")
   implicit def BlackjackHandsCodecJson = casecodec1(BlackjackHands.apply, BlackjackHands.unapply)("hands")
 }
