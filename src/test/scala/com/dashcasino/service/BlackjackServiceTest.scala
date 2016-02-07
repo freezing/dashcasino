@@ -137,7 +137,7 @@ class BlackjackServiceTest extends DashUnitTest {
     accountDao.findAccount(user.id).get.amount should be (BigDecimal(25.0))
   }
   it should "test if dealer and user blackjack is a tie" in {
-    val user = userService.registerUser(User(-1, "blackjackservicetest_userwinsafteronehit@gmail.com", "testpass123123", -1))
+    val user = userService.registerUser(User(-1, "blackjackservicetest_blackjacktie@gmail.com", "testpass123123", -1))
     accountService.externalDeposit(ExternalDeposit(user.id, BigDecimal(10.0), "Wanna play some BJ!!!"))
     val deck = createNewDeckBothBlackjacks
 
@@ -162,7 +162,7 @@ class BlackjackServiceTest extends DashUnitTest {
   }
   it should "test no duobledown allowed after hit" in {
     intercept[CantDoubleDownException] {
-      val user = userService.registerUser(User(-1, "blackjackservicetest_userwinsafterdoubledown@gmail.com", "testpass123123", -1))
+      val user = userService.registerUser(User(-1, "blackjackservicetest_nodoubledownafterhit@gmail.com", "testpass123123", -1))
       accountService.externalDeposit(ExternalDeposit(user.id, BigDecimal(20.0), "Wanna play some BJ!!!"))
       val deck = createNewDeckUserWins
 
@@ -202,7 +202,7 @@ class BlackjackServiceTest extends DashUnitTest {
     accountDao.findAccount(user.id).get.amount should be (4 * betAmount)
   }
   it should "test if user earns money after he wins" in {
-    val user = userService.registerUser(User(-1, "blackjackservicetest_userwinsafteronehit@gmail.com", "testpass123123", -1))
+    val user = userService.registerUser(User(-1, "blackjackservicetest_userearnsmoneyafterwin@gmail.com", "testpass123123", -1))
     accountService.externalDeposit(ExternalDeposit(user.id, BigDecimal(10.0), "Wanna play some BJ!!!"))
     val deck = createNewDeckUserWins
 
@@ -370,14 +370,14 @@ class BlackjackServiceTest extends DashUnitTest {
       val gameState = blackjackService bet BlackjackBet(user.id, deck.id, BigDecimal(4.0))
       blackjackService split BlackjackSplit(user.id, gameState.gameId)
     }
-    it should "throw an exception if user has no money to split" in {
-      intercept[NotEnoughMoneyException] {
-        val user = userService.registerUser(User(-1, "blackjackservicetest_cantsplitnomoney@gmail.com", "testpass123", -1))
-        val deck = createNewDeckSplit
-        accountService.externalDeposit(ExternalDeposit(user.id, BigDecimal(10.0), ""))
-        val gameState = blackjackService bet BlackjackBet(user.id, deck.id, BigDecimal(7.0))
-        blackjackService split BlackjackSplit(user.id, gameState.gameId)
-      }
+  }
+  it should "throw an exception if user has no money to split" in {
+    intercept[NotEnoughMoneyException] {
+      val user = userService.registerUser(User(-1, "blackjackservicetest_cantsplitnomoney@gmail.com", "testpass123", -1))
+      val deck = createNewDeckSplit
+      accountService.externalDeposit(ExternalDeposit(user.id, BigDecimal(10.0), ""))
+      val gameState = blackjackService bet BlackjackBet(user.id, deck.id, BigDecimal(7.0))
+      blackjackService split BlackjackSplit(user.id, gameState.gameId)
     }
   }
 
