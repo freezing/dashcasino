@@ -12,6 +12,7 @@ class CommandService(implicit val commandDao: CommandSqlDao) {
   val BLACKJACK_HIT = "BLACKJACK_HIT"
   val BLACKJACK_STAND = "BLACKJACK_STAND"
   val BLACKJACK_DOUBLEDOWN = "BLACKJACK_DOUBLEDOWN"
+  val BLACKJACK_SPLIT = "BLACKJACK_SPLIT"
 
   initialize()
 
@@ -29,6 +30,7 @@ class CommandService(implicit val commandDao: CommandSqlDao) {
   def blackjackHit = command(BLACKJACK_HIT)
   def blackjackStand = command(BLACKJACK_STAND)
   def blackjackDoubleDown = command(BLACKJACK_DOUBLEDOWN)
+  def blackjackSplit = command(BLACKJACK_SPLIT)
 
   def externalWithdrawal = command(EXTERNAL_WITHDRAWAL)
   def externalDeposit = command(EXTERNAL_DEPOSIT)

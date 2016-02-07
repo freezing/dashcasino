@@ -34,7 +34,10 @@ trait BlackjackDoubleDownCommand { self: BlackjackServiceActor =>
   }
 
   def canDoubleDown(gameState: BlackjackGameState): Boolean = {
-    canDoubleDown(gameState.userHand.hands.head) && gameState.userHand.hands.last.status == BlackjackHandStatus.EMPTY
+    gameState.userHand.hands collectFirst { case hand if hand.status == BlackjackHandStatus.OPEN => hand } match {
+      case Some(h) => canDoubleDown(h)
+      case None => false
+    }
   }
 
   def canDoubleDown(hand: BlackjackHand): Boolean = hand.status match {

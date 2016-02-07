@@ -12,7 +12,7 @@ import spray.util.NotImplementedException
 /**
   * Created by freezing on 1/31/16.
   */
-trait BlackjackStateTransition extends BlackjackStateTransitionHit with BlackjackStateTransitionDealerDrawing with BlackjackStateTransitionStand with BlackjackStateTransitionDoubleDown { self: BlackjackServiceActor =>
+trait BlackjackStateTransition extends BlackjackStateTransitionSplit with BlackjackStateTransitionHit with BlackjackStateTransitionDealerDrawing with BlackjackStateTransitionStand with BlackjackStateTransitionDoubleDown { self: BlackjackServiceActor =>
   val NOT_PAID = false
 
   def hideIfNotBlackjack(hand: BlackjackHand)(implicit blackjackCardDao: BlackjackCardSqlDao): BlackjackHand = {
@@ -125,6 +125,7 @@ trait BlackjackStateTransition extends BlackjackStateTransitionHit with Blackjac
       case CommandService.BLACKJACK_HIT => nextStateAfterHit(blackjackGameState, deck, nextCard)
       case CommandService.BLACKJACK_STAND => nextStateAfterStand(blackjackGameState, deck)
       case CommandService.BLACKJACK_DOUBLEDOWN => nextStateAfterDoubleDown(blackjackGameState, deck, nextCard)
+      case CommandService.BLACKJACK_SPLIT => nextStateAfterSplit(blackjackGameState, deck)
       case unknownCommand => throw new NotImplementedException(s"Command $unknownCommand hasn't been implemented yet!")
     }
   }
