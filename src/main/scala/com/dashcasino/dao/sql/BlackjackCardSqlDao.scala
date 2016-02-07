@@ -16,7 +16,7 @@ class BlackjackCardSqlDao(implicit val session: AutoSession.type) {
 
   def findBlackjackCard(rankLetter: String, suitLetter: String) = sql"SELECT * FROM BlackjackCard WHERE RankLetter=$rankLetter AND SuitLetter=$suitLetter".map(toBlackjackCard).single().apply()
 
-  def findBlackjackCard(code: Int) = sql"SELECT * FROM BlackjackCard WHERE Code=$code".map(toBlackjackCard).single.apply
+  def findBlackjackCard(code: Int) = sql"SELECT * FROM BlackjackCard WHERE Code=$code".map(toBlackjackCard).single.apply.get
 
   def unshuffledBlackjackCards() = sql"SELECT * FROM BlackjackCard ORDER BY Id".map(toBlackjackCard).list.apply
 
@@ -36,9 +36,10 @@ class BlackjackCardSqlDao(implicit val session: AutoSession.type) {
           vals(8).toInt)
       }
       val card = BlackjackCard(-1, code, rankCode, rankName, rankLetter, suitName, suitLetter, suitCode, primaryValue, secondaryValue)
-      findBlackjackCard(code) match {
-        case None => insertBlackjackCard(card)
-        case Some(_) =>
+      try {
+        findBlackjackCard(code)
+      } catch {
+        case e: Exception => insertBlackjackCard(card)
       }
     }
   }

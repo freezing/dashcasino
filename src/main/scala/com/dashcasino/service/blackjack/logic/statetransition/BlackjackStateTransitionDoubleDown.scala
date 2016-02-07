@@ -12,11 +12,30 @@ import com.dashcasino.service.blackjack.logic.actor.BlackjackServiceActor
 trait BlackjackStateTransitionDoubleDown {  self: BlackjackServiceActor =>
   def nextStateAfterDoubleDown(oldState: BlackjackGameState, deck: BlackjackDeck, nextCard: Int)
                        (implicit blackjackCardDao: BlackjackCardSqlDao, commandService: CommandService, statusCodeService: StatusCodeService): BlackjackGameState = {
-    val hitState = nextStateAfterHit(oldState, deck, nextCard)
-    val doubleDownState = {
-      if (hitState.statusCode == statusCodeService.blackjackRoundRunning.code) nextStateAfterStand(hitState, deck, BlackjackHandStatus.DOUBLE_DOWN)
-      else hitState
+    val newUserBlackjackHands = findAndUpdateFirstOpenHand(oldState.userHand, (hand: BlackjackHand) => {
+      val newCards = hand.cards ++ List(blackjackCardDao.findBlackjackCard(nextCard))
+      val newStatus = newStatusAfterDoubleDown(newCards)
+      // Double the money
+      hand.copy(cards = newCards, status = newStatus, money = hand.money * 2)
+    })
+
+    val statusCode = getGameStatus(newUserBlackjackHands).code
+
+    val newDealerHand = {
+      // Dealer shouldn't draw after, hit unless user is standing - i.e. has exactly 21 which is autostand
+      val hasDoubleDown = newUserBlackjackHands.hands exists { _.status == BlackjackHandStatus.DOUBLE_DOWN }
+      if (statusCodeService.isGameFinished(statusCode) && hasDoubleDown) getFinalDealerHand(newUserBlackjackHands, oldState.dealerHand, deck)
+      else oldState.dealerHand
     }
-    doubleDownState.copy(commandCode = commandService.blackjackDoubleDown.code)
+
+    val userHandsOutcome = userHandsWithOutcome(newUserBlackjackHands, newDealerHand)
+    oldState.copy(userHand = userHandsOutcome, dealerHand = newDealerHand, commandCode = commandService.blackjackHit.code, statusCode = statusCode)
+  }
+  def newStatusAfterDoubleDown(cards: List[BlackjackCard]): String = {
+    // Status is the same as HIT status. Exception is when the status is OPEN or STANDING, it will become DOUBLE-DOWN
+    newStatusAfterHit(cards) match {
+      case BlackjackHandStatus.OPEN | BlackjackHandStatus.STANDING => BlackjackHandStatus.DOUBLE_DOWN
+      case other => other
+    }
   }
 }

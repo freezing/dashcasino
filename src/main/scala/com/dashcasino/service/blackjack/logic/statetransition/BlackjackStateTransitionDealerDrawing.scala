@@ -10,14 +10,14 @@ import com.dashcasino.service.blackjack.logic.actor.BlackjackServiceActor
   */
 trait BlackjackStateTransitionDealerDrawing { self: BlackjackServiceActor =>
   def getFinalDealerHand(userHands: BlackjackHands, dealerHand: BlackjackHand, deck: BlackjackDeck)
-                        (implicit blackjackCardSqlDao: BlackjackCardSqlDao): BlackjackHand = {
+                        (implicit blackjackCardDao: BlackjackCardSqlDao): BlackjackHand = {
     // Draw until not busted or soft-hand >= 17
     var newDealerHand = unhideDealerFirstCard(dealerHand, deck)
 
     var nextCardIdx = dealerHand.cards.length + userHands.hands.head.cards.length + userHands.hands(1).cards.length
 
     while (dealerShouldDraw(newDealerHand)) {
-      val nextCard =  getCard(deck.order.cards(nextCardIdx))
+      val nextCard =  blackjackCardDao.findBlackjackCard(deck.order.cards(nextCardIdx))
       newDealerHand = updateDealerStatus(drawCard(newDealerHand, nextCard))
       nextCardIdx += 1
     }

@@ -13,11 +13,11 @@ import spray.util.NotImplementedException
   * Created by freezing on 1/31/16.
   */
 trait BlackjackStateTransition extends BlackjackStateTransitionHit with BlackjackStateTransitionDealerDrawing with BlackjackStateTransitionStand with BlackjackStateTransitionDoubleDown { self: BlackjackServiceActor =>
-  def hideIfNotBlackjack(hand: BlackjackHand): BlackjackHand = {
+  def hideIfNotBlackjack(hand: BlackjackHand)(implicit blackjackCardDao: BlackjackCardSqlDao): BlackjackHand = {
     isBlackjack(hand.cards) match {
       case true => hand.copy(status = BlackjackHandStatus.BLACKJACK)
         // First card stays hidden, second one is shown
-      case false => hand.copy(cards = List(getCard(BlackjackCardCodes.FACE_DOWN), hand.cards(1)), status = BlackjackHandStatus.DEALER)
+      case false => hand.copy(cards = List(blackjackCardDao.findBlackjackCard(BlackjackCardCodes.FACE_DOWN), hand.cards(1)), status = BlackjackHandStatus.DEALER)
     }
   }
 
@@ -43,16 +43,16 @@ trait BlackjackStateTransition extends BlackjackStateTransitionHit with Blackjac
   }
 
   // TODO: Create separate methods for CREATE_USER_HAND and CREATE_DEALER_HAND
-  def createUserHand(firstCardCode: Int, secondCardCode: Int, money: BigDecimal): BlackjackHand = {
-    val card1 = getCard(firstCardCode)
-    val card2 = getCard(secondCardCode)
+  def createUserHand(firstCardCode: Int, secondCardCode: Int, money: BigDecimal)(implicit blackjackCardDao: BlackjackCardSqlDao): BlackjackHand = {
+    val card1 = blackjackCardDao.findBlackjackCard(firstCardCode)
+    val card2 = blackjackCardDao.findBlackjackCard(secondCardCode)
     val cards = List(card1, card2)
     BlackjackHand(cards, getHandStatus(cards), BlackjackHandOutcome.PENDING, money)
   }
 
-  def createDealerHand(firstCardCode: Int, secondCardCode: Int, money: BigDecimal): BlackjackHand = {
-    val card1 = getCard(firstCardCode)
-    val card2 = getCard(secondCardCode)
+  def createDealerHand(firstCardCode: Int, secondCardCode: Int, money: BigDecimal)(implicit blackjackCardDao: BlackjackCardSqlDao): BlackjackHand = {
+    val card1 = blackjackCardDao.findBlackjackCard(firstCardCode)
+    val card2 = blackjackCardDao.findBlackjackCard(secondCardCode)
     val cards = List(card1, card2)
     BlackjackHand(cards, getDealerHandStatus(cards), BlackjackHandOutcome.PENDING, money)
   }
@@ -189,5 +189,15 @@ trait BlackjackStateTransition extends BlackjackStateTransitionHit with Blackjac
     if (userScore > dealerScore) userHand.copy(outcome = BlackjackHandOutcome.WON)
     else if (userScore < dealerScore) userHand.copy(outcome = BlackjackHandOutcome.LOST)
     else userHand.copy(outcome = BlackjackHandOutcome.TIE)
+  }
+
+  def findAndUpdateFirstOpenHand(userHands: BlackjackHands, updateFunction: (BlackjackHand) => BlackjackHand): BlackjackHands = {
+    var foundFirst = false
+    BlackjackHands(userHands.hands map { h => if (!foundFirst && h.status == BlackjackHandStatus.OPEN) {
+      foundFirst = true
+      updateFunction(h)
+    } else {
+      h
+    }})
   }
 }

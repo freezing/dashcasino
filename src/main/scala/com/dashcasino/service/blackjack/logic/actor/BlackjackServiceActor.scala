@@ -35,11 +35,6 @@ class BlackjackServiceActor(implicit val blackjackDeckService: BlackjackDeckServ
     if (userId != game.userId) throw new AuthorizationException(s"User $userId has no authorization over game: $game")
   }
 
-  def getCard(code: Int): BlackjackCard = blackjackCardDao.findBlackjackCard(code) match {
-    case Some(x) => x
-    case None => throw new IllegalRequestException(s"Invalid card code: $code")
-  }
-
   def getDeck(deckId: Int): BlackjackDeck =
     blackjackDeckSqlDao.findBlackjackDeck(deckId) match {
       case Some(x) => x
