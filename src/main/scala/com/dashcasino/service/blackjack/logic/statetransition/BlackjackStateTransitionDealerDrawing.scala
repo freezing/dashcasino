@@ -9,17 +9,10 @@ import com.dashcasino.service.blackjack.logic.actor.BlackjackServiceActor
   * Created by freezing on 1/31/16.
   */
 trait BlackjackStateTransitionDealerDrawing { self: BlackjackServiceActor =>
-  def isGameFinished(userHands: BlackjackHands): Boolean = {
-    val nonFinishedHands = userHands.hands collect { case hand if !isHandFinished(hand) => hand}
-    nonFinishedHands.isEmpty
-  }
-
-  def isHandFinished(hand: BlackjackHand): Boolean = !isOpen(hand.cards)
-
   def getFinalDealerHand(userHands: BlackjackHands, dealerHand: BlackjackHand, deck: BlackjackDeck)
                         (implicit blackjackCardSqlDao: BlackjackCardSqlDao): BlackjackHand = {
     // Draw until not busted or soft-hand >= 17
-    var newDealerHand = dealerHand
+    var newDealerHand = unhideDealerFirstCard(dealerHand, deck)
 
     var nextCardIdx = dealerHand.cards.length + userHands.hands.head.cards.length + userHands.hands(1).cards.length
 
@@ -29,6 +22,13 @@ trait BlackjackStateTransitionDealerDrawing { self: BlackjackServiceActor =>
       nextCardIdx += 1
     }
     newDealerHand
+  }
+
+  // TODO: This is now HARDCODED for only ONE ROUND per deck shuffle, this should be changed to support more rounds per deck shuffle
+  // TODO: In order to do that, we need some indicator that will say what was the starting position of the new round.
+  // TODO: New colletion should be added such as BlackjackRound which will contain starting card position and game id.
+  def unhideDealerFirstCard(dealerHand: BlackjackHand, blackjackDeck: BlackjackDeck): BlackjackHand = {
+    createDealerHand(blackjackDeck.order.cards(1), blackjackDeck.order.cards(3), dealerHand.money)
   }
 
   def updateDealerStatus(hand: BlackjackHand): BlackjackHand = {
@@ -44,10 +44,11 @@ trait BlackjackStateTransitionDealerDrawing { self: BlackjackServiceActor =>
 
       if (nonBustedValues.isEmpty) BlackjackHandStatus.BUSTED
       else if (dealerOpenValues.isEmpty) BlackjackHandStatus.STANDING
-      else BlackjackHandStatus.OPEN
+      else BlackjackHandStatus.DEALER
     }
     hand.copy(status = status)
   }
 
-  def dealerShouldDraw(hand: BlackjackHand): Boolean = hand.status == BlackjackHandStatus.OPEN
+  // Dealer hand status DEALER is similar to user's hand status DEALER
+  def dealerShouldDraw(hand: BlackjackHand): Boolean = hand.status == BlackjackHandStatus.DEALER
 }

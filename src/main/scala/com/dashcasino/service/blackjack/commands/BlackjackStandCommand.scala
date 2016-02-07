@@ -30,8 +30,8 @@ trait BlackjackStandCommand { self: BlackjackServiceActor =>
     val nextGameState = getNextState(game.blackjackDeckId, gameState, commandService.blackjackStand)
     blackjackGameStateDao.insertBlackjackGameState(nextGameState)
 
-    // Return user's hands
-    nextGameState.userHand
+    // Return state after hitting the stand
+    nextGameState
   }
 
   // TODO: REFACTOR SINCE CAN STAND AND CAN HIT HAVE THE SAME LOGIC

@@ -22,4 +22,6 @@ class StatusCodeService(implicit val statusDao: StatusCodeSqlDao) {
   def blackjackGameFinished = status(BLACKJACK_GAME_FINISHED)
   def blackjackRoundRunning = status(BLACKJACK_ROUND_RUNNING)
   def blackjackRoundFinished = status(BLACKJACK_ROUND_FINISHED)
+
+  def isGameFinished(statusCode: Int): Boolean = statusCode == blackjackGameFinished.code || statusCode == blackjackRoundFinished.code
 }

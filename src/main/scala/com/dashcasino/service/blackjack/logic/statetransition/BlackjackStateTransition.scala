@@ -34,18 +34,34 @@ trait BlackjackStateTransition extends BlackjackStateTransitionHit with Blackjac
     else BlackjackHandStatus.STANDING
   }
 
-  def createHand(firstCardCode: Int, secondCardCode: Int, money: BigDecimal): BlackjackHand = {
+  // TODO: This is the same as above only OPEN != DEALER, Should be REFACTORED in a better way
+  def getDealerHandStatus(cards: List[BlackjackCard]) = {
+    getHandStatus(cards) match {
+      case BlackjackHandStatus.OPEN => BlackjackHandStatus.DEALER
+      case x => x
+    }
+  }
+
+  // TODO: Create separate methods for CREATE_USER_HAND and CREATE_DEALER_HAND
+  def createUserHand(firstCardCode: Int, secondCardCode: Int, money: BigDecimal): BlackjackHand = {
     val card1 = getCard(firstCardCode)
     val card2 = getCard(secondCardCode)
     val cards = List(card1, card2)
-    BlackjackHand(cards, getHandStatus(cards), money)
+    BlackjackHand(cards, getHandStatus(cards), BlackjackHandOutcome.PENDING, money)
+  }
+
+  def createDealerHand(firstCardCode: Int, secondCardCode: Int, money: BigDecimal): BlackjackHand = {
+    val card1 = getCard(firstCardCode)
+    val card2 = getCard(secondCardCode)
+    val cards = List(card1, card2)
+    BlackjackHand(cards, getDealerHandStatus(cards), BlackjackHandOutcome.PENDING, money)
   }
 
   def createInitialUserHand(deck: BlackjackDeck, money: BigDecimal): BlackjackHand =
-    createHand(deck.order.cards(0), deck.order.cards(2), money)
+    createUserHand(deck.order.cards(0), deck.order.cards(2), money)
 
   def createInitialDealerHand(deck: BlackjackDeck, money: BigDecimal): BlackjackHand =
-    hideIfNotBlackjack(createHand(deck.order.cards(1), deck.order.cards(3), money))
+    hideIfNotBlackjack(createDealerHand(deck.order.cards(1), deck.order.cards(3), money))
 
   /**
     * Initial state is created by the following rules:
@@ -55,8 +71,6 @@ trait BlackjackStateTransition extends BlackjackStateTransitionHit with Blackjac
     * 4. Draw card and deal it to dealer face-up
  *
     * @param blackjackDeckId Deck id used to retrieve deck configuration (i.e. order)
-    * @param blackjackDeckDao
-    * @param blackjackCardDao
     * @return Initial BlackjackGameState after the BET is placed.
     */
   def getInitialState(blackjackDeckId: Int, gameId: Int, money: BigDecimal)(implicit blackjackDeckDao: BlackjackDeckSqlDao, blackjackCardDao: BlackjackCardSqlDao, commandService: CommandService, statusCodeService: StatusCodeService): BlackjackGameState = {
@@ -64,7 +78,7 @@ trait BlackjackStateTransition extends BlackjackStateTransitionHit with Blackjac
 
     // User hand is created from cards at indices 0 and 2
     val firstUserHand = createInitialUserHand(deck, money)
-    val userBlackjackHands = List(firstUserHand, BlackjackHand(List.empty[BlackjackCard], BlackjackHandStatus.EMPTY, 0.0))
+    val userBlackjackHands = List(firstUserHand, BlackjackHand(List.empty[BlackjackCard], BlackjackHandStatus.EMPTY, BlackjackHandOutcome.PENDING, 0.0))
     val userHand = BlackjackHands(userBlackjackHands)
 
     val description = "Nothing for now"
@@ -85,9 +99,9 @@ trait BlackjackStateTransition extends BlackjackStateTransitionHit with Blackjac
 
     // TODO: Think of a way to refactor. This is not very nice
     command.name match {
-      case CommandService.BLACKJACK_HIT => nextStateAfterHit(blackjackGameState, deck, userHands, dealerHand, nextCard)
-      case CommandService.BLACKJACK_STAND => nextStateAfterStand(blackjackGameState, userHands)
-      case CommandService.BLACKJACK_DOUBLEDOWN => nextStateAfterDoubleDown(blackjackGameState, deck, userHands, dealerHand, nextCard)
+      case CommandService.BLACKJACK_HIT => nextStateAfterHit(blackjackGameState, deck, nextCard)
+      case CommandService.BLACKJACK_STAND => nextStateAfterStand(blackjackGameState, deck)
+      case CommandService.BLACKJACK_DOUBLEDOWN => nextStateAfterDoubleDown(blackjackGameState, deck, nextCard)
       case unknownCommand => throw new NotImplementedException(s"Command $unknownCommand hasn't been implemented yet!")
     }
   }
@@ -125,6 +139,16 @@ trait BlackjackStateTransition extends BlackjackStateTransitionHit with Blackjac
     List(softHand, hardHand)
   }
 
+  /**
+    * Calcultes best hand value from the soft and hard values.
+    * @param handValues
+    */
+  def bestHandValue(handValues: List[Int]): Int = {
+    val (soft, hard) = (handValues.head, handValues.last)
+    if (hard <= 21) hard
+    else soft
+  }
+
   def getSoftValue(card: BlackjackCard): Int = {
     // If both values are valid return minimum
     // else return primary value (it is always valid)
@@ -141,5 +165,29 @@ trait BlackjackStateTransition extends BlackjackStateTransitionHit with Blackjac
   def getGameStatus(userHands: BlackjackHands)(implicit statusCodeService: StatusCodeService): StatusCode = {
     if (userHands.hands exists { h => h.status == BlackjackHandStatus.OPEN }) statusCodeService.blackjackRoundRunning
     else statusCodeService.blackjackRoundFinished
+  }
+
+  def userHandsWithOutcome(userHands: BlackjackHands, dealerHand: BlackjackHand): BlackjackHands = {
+    BlackjackHands(userHands.hands map { userHandWithOutcome(_, dealerHand) })
+  }
+
+  def userHandWithOutcome(userHand: BlackjackHand, dealerHand: BlackjackHand): BlackjackHand = {
+    // If user hand is empty then just return it
+    if (userHand.status == BlackjackHandStatus.EMPTY || userHand.status == BlackjackHandStatus.OPEN) userHand
+    // If player is BUSTED then outcome is LOST
+    else if (userHand.status == BlackjackHandStatus.BUSTED) userHand.copy(outcome = BlackjackHandOutcome.LOST)
+    else if (dealerHand.status == BlackjackHandStatus.BUSTED) userHand.copy(outcome = BlackjackHandOutcome.WON)
+    else if (dealerHand.status == BlackjackHandStatus.STANDING &&
+      (userHand.status == BlackjackHandStatus.STANDING || userHand.status == BlackjackHandStatus.DOUBLE_DOWN)) userHandWithOutcomeBasedOnScores(userHand, dealerHand)
+    else throw new IllegalStateException(s"Unhandled state:\nUser hand: $userHand\nDealer hand: $dealerHand")
+  }
+
+  def userHandWithOutcomeBasedOnScores(userHand: BlackjackHand, dealerHand: BlackjackHand): BlackjackHand = {
+    val userScore = bestHandValue(calculateHandValues(userHand.cards))
+    val dealerScore = bestHandValue(calculateHandValues(dealerHand.cards))
+
+    if (userScore > dealerScore) userHand.copy(outcome = BlackjackHandOutcome.WON)
+    else if (userScore < dealerScore) userHand.copy(outcome = BlackjackHandOutcome.LOST)
+    else userHand.copy(outcome = BlackjackHandOutcome.TIE)
   }
 }

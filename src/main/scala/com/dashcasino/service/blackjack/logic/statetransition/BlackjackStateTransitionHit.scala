@@ -10,9 +10,10 @@ import com.dashcasino.service.{StatusCodeService, CommandService}
   * Created by freezing on 1/31/16.
   */
 trait BlackjackStateTransitionHit { self: BlackjackStateTransition =>
-  def nextStateAfterHit(oldState: BlackjackGameState, deck: BlackjackDeck, userHands: BlackjackHands, dealerHand: BlackjackHand, nextCard: Int)
+  def nextStateAfterHit(oldState: BlackjackGameState, deck: BlackjackDeck, nextCard: Int)
                        (implicit blackjackCardDao: BlackjackCardSqlDao, commandService: CommandService, statusCodeService: StatusCodeService): BlackjackGameState = {
-
+    val userHands = oldState.userHand
+    val dealerHand = oldState.dealerHand
     // Find user's hand that is open with priority for the first one
     // TODO: IMPORTANT, REFACTOR THIS CODE SO IT USES SCALA BUILT-IN METHODS INSTEAD OF FOR COMPREHENSION OVER INDICES
 
@@ -44,9 +45,15 @@ trait BlackjackStateTransitionHit { self: BlackjackStateTransition =>
     val statusCode = getGameStatus(newUserBlackjackHands).code
 
     val newDealerHand = {
-      if (isGameFinished(newUserBlackjackHands)) getFinalDealerHand(newUserBlackjackHands, dealerHand, deck)
+      // Dealer shouldn't draw after, hit unless user is standing - i.e. has exactly 21 which is autostand
+      // TODO: This should be implemented as HIT COMMAND then calling STAND command if hand value is 21
+      val hasStanding = newUserBlackjackHands.hands exists { _.status == BlackjackHandStatus.STANDING }
+      if (statusCodeService.isGameFinished(statusCode) && hasStanding) getFinalDealerHand(newUserBlackjackHands, dealerHand, deck)
       else dealerHand
     }
-    oldState.copy(userHand = newUserBlackjackHands, dealerHand = newDealerHand, commandCode = commandService.blackjackHit.code, statusCode = statusCode)
+
+    val userHandsOutcome = userHandsWithOutcome(newUserBlackjackHands, newDealerHand)
+
+    oldState.copy(userHand = userHandsOutcome, dealerHand = newDealerHand, commandCode = commandService.blackjackHit.code, statusCode = statusCode)
   }
 }
