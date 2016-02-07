@@ -4,7 +4,7 @@ import com.dashcasino.DashUnitTest
 import com.dashcasino.exception.NotEnoughMoneyException
 import com.dashcasino.model._
 import com.dashcasino.service.account.ExternalDeposit
-import com.dashcasino.service.blackjack.{BlackjackStand, BlackjackHit, BlackjackBet}
+import com.dashcasino.service.blackjack.{BlackjackDoubleDown, BlackjackStand, BlackjackHit, BlackjackBet}
 
 /**
   * Created by freezing on 2/4/16.
@@ -51,7 +51,6 @@ class BlackjackServiceTest extends DashUnitTest {
   it should "work perfectly for this long sanity test" in {
     // Register user
     val user = userService.registerUser(User(-1, "blackjackservicetest_longsanity@gmail.com", "testpass123", -1))
-    val account = accountDao.findAccount(user.id)
 
     // Deposit some money into account
     accountService.externalDeposit(ExternalDeposit(user.id, 100.0, "{Description: Lets play some blackjack}"))
@@ -163,11 +162,23 @@ class BlackjackServiceTest extends DashUnitTest {
     val account = accountDao.findAccount(user.id).get
     account.amount should be (BigDecimal(90.0))
   }
-  it should "throw an exception NotEnoughMoneyException if use has no money for BET" in {
+  it should "throw an exception NotEnoughMoneyException if user has no money for BET" in {
     intercept[NotEnoughMoneyException] {
       val user = userService.registerUser(User(-1, "blackjackservicetest_betnomoney@gmail.com", "testpass123", -1))
       val deck = createNewDeck
       blackjackService bet BlackjackBet(user.id, deck.id, 10.0)
+    }
+  }
+  it should "throw an exception NotEnoughMoneyException if user has no money for DOUBLEDOWN" in {
+    intercept[NotEnoughMoneyException] {
+      val user = userService.registerUser(User(-1, "blacjackservicetest_doubledownnomoney@gmail.com", "testpass123", -1))
+      val deck = createNewDeck
+      // Add some money
+      accountService.externalDeposit(ExternalDeposit(user.id, BigDecimal(10.0), ""))
+      // Bet
+      val gameState = blackjackService bet BlackjackBet(user.id, deck.id, BigDecimal(7.0))
+      // Try to DoubleDown
+      blackjackService doubleDown BlackjackDoubleDown(user.id, gameState.gameId)
     }
   }
 

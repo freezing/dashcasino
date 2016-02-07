@@ -64,4 +64,8 @@ class BlackjackServiceActor(implicit val blackjackDeckService: BlackjackDeckServ
     // TODO: Send email report
     case None => throw new IllegalRequestException(s"Invalid game id: $gameId")
   }
+
+  def currentUserHand(state: BlackjackGameState): BlackjackHand = {
+    (state.userHand.hands collectFirst { case hand if hand.status == BlackjackHandStatus.OPEN => hand }).head
+  }
 }
