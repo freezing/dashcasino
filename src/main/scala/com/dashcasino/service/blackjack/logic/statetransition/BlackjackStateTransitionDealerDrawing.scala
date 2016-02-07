@@ -12,7 +12,7 @@ trait BlackjackStateTransitionDealerDrawing { self: BlackjackServiceActor =>
   def getFinalDealerHand(userHands: BlackjackHands, dealerHand: BlackjackHand, deck: BlackjackDeck)
                         (implicit blackjackCardDao: BlackjackCardSqlDao): BlackjackHand = {
     // Draw until not busted or soft-hand >= 17
-    var newDealerHand = unhideDealerFirstCard(dealerHand, deck)
+    var newDealerHand = updateDealerStatus(unhideDealerFirstCard(dealerHand, deck))
 
     var nextCardIdx = dealerHand.cards.length + userHands.hands.head.cards.length + userHands.hands(1).cards.length
 

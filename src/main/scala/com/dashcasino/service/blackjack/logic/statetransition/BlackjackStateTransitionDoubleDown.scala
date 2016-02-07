@@ -28,7 +28,7 @@ trait BlackjackStateTransitionDoubleDown {  self: BlackjackServiceActor =>
       else oldState.dealerHand
     }
 
-    val userHandsOutcome = userHandsWithOutcome(newUserBlackjackHands, newDealerHand)
+    val userHandsOutcome = userHandsWithOutcome(newUserBlackjackHands, newDealerHand, statusCode)
     oldState.copy(userHand = userHandsOutcome, dealerHand = newDealerHand, commandCode = commandService.blackjackHit.code, statusCode = statusCode)
   }
   def newStatusAfterDoubleDown(cards: List[BlackjackCard]): String = {

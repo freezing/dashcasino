@@ -25,7 +25,7 @@ trait BlackjackStateTransitionStand { self: BlackjackStateTransition =>
       else dealerHand
     }
 
-    val userHandsOutcome = userHandsWithOutcome(newUserBlackjackHands, newDealerHand)
+    val userHandsOutcome = userHandsWithOutcome(newUserBlackjackHands, newDealerHand, statusCode)
     blackjackGameState.copy(userHand = userHandsOutcome, dealerHand = newDealerHand, statusCode = statusCode, commandCode = commandService.blackjackStand.code)
   }
 }

@@ -192,8 +192,12 @@ trait BlackjackStateTransition extends BlackjackStateTransitionSplit with Blackj
     else statusCodeService.blackjackRoundFinished
   }
 
-  def userHandsWithOutcome(userHands: BlackjackHands, dealerHand: BlackjackHand): BlackjackHands = {
-    BlackjackHands(userHands.hands map { userHandWithOutcome(_, dealerHand) })
+  def userHandsWithOutcome(userHands: BlackjackHands, dealerHand: BlackjackHand, statusCode: Int)(implicit statusCodeService: StatusCodeService): BlackjackHands = {
+    if (statusCodeService.blackjackRoundFinished.code == statusCode || statusCodeService.blackjackGameFinished.code == statusCode) {
+      BlackjackHands(userHands.hands map { userHandWithOutcome(_, dealerHand) })
+    } else {
+      userHands
+    }
   }
 
   def userHandWithOutcome(userHand: BlackjackHand, dealerHand: BlackjackHand): BlackjackHand = {

@@ -26,7 +26,7 @@ trait BlackjackStateTransitionHit { self: BlackjackStateTransition =>
       if (statusCodeService.isGameFinished(statusCode) && hasStanding) getFinalDealerHand(newUserBlackjackHands, oldState.dealerHand, deck)
       else oldState.dealerHand
     }
-    val userHandsOutcome = userHandsWithOutcome(newUserBlackjackHands, newDealerHand)
+    val userHandsOutcome = userHandsWithOutcome(newUserBlackjackHands, newDealerHand, statusCode)
     oldState.copy(userHand = userHandsOutcome, dealerHand = newDealerHand, commandCode = commandService.blackjackHit.code, statusCode = statusCode)
   }
 
