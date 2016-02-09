@@ -44,7 +44,7 @@ package object model {
   // NOTE: Primary and Secondary values are for the Ace
   case class BlackjackCard(id: Int, code: Int, rankCode: Int, rankName: String, rankLetter: String, suitName: String, suitLetter: String, suitCode: Int, primaryValue: Int, secondaryValue: Int)
   case class BlackjackDeckOrder(cards: List[Int])
-  case class BlackjackDeck(id: Int, order: BlackjackDeckOrder, serverSeed: String, clientSeed: String, isSigned: Boolean, timestamp: Long)
+  case class BlackjackDeck(id: Int, order: BlackjackDeckOrder, serverSeed: Long, clientSeed: String, isSigned: Boolean, timestamp: Long)
 
   // These two are not connected to any tables. They will just represent UserHand and DealerHand in a nice
   // Case class format using argonaut, and convert hands to JSON ready string for SQL
