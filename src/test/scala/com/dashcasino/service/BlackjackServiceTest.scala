@@ -48,7 +48,7 @@ class BlackjackServiceTest extends DashUnitTest {
     startState.statusCode should be (statusService.blackjackRoundRunning.code)
   }
   it should "test if split works - user WIN-BUSTED" in {
-    val user = userService.registerUser(User(-1, "blackjackservicetest_split@gmail.com", "testpass123", -1))
+    val user = userService.registerUser(User(-1, "blackjackservicetest_split_win_busted@gmail.com", "testpass123", -1))
 
     // Deposit some money into account
     val depositMoney = BigDecimal(100.0)
@@ -109,6 +109,69 @@ class BlackjackServiceTest extends DashUnitTest {
 
     // Check account balance
     accountDao.findAccount(user.id).get.amount should be (BigDecimal(100.0))
+  }
+  it should "test if split works - user WIN-WIN" in {
+    val user = userService.registerUser(User(-1, "blackjackservicetest_split_win_win@gmail.com", "testpass123", -1))
+
+    // Deposit some money into account
+    val depositMoney = BigDecimal(100.0)
+    accountService.externalDeposit(ExternalDeposit(user.id, depositMoney, "{Description: Lets play some blackjack}"))
+
+    val deck = createNewDeckSplitWinWin
+    val betAmount = BigDecimal(10.0)
+    val gameId = (blackjackService bet BlackjackBet(user.id, deck.id, betAmount)).gameId
+    accountDao.findAccount(user.id).get.amount should be (BigDecimal(90.0))
+    val splitState = blackjackService split BlackjackSplit(user.id, gameId)
+
+    // Check that user has 10 and 11
+    splitState.userHand.hands.head.cardCodes should be (List(10))
+    splitState.userHand.hands.last.cardCodes should be (List(11))
+    // Check that statuses are open
+    splitState.userHand.hands.head.status should be (BlackjackHandStatus.OPEN)
+    splitState.userHand.hands.last.status should be (BlackjackHandStatus.OPEN)
+    // Check command and status
+    splitState.commandCode should be (commandService.blackjackSplit.code)
+    splitState.statusCode should be (statusService.blackjackRoundRunning.code)
+
+    // Check that account has 80 in it (two bets)
+    accountDao.findAccount(user.id).get.amount should be (BigDecimal(80.0))
+
+    // Hit once then stand
+    blackjackService hit BlackjackHit(user.id, gameId)
+    val firstStandState = blackjackService stand BlackjackStand(user.id, gameId)
+    // Check that first hand is standing and has {10, 12}
+    firstStandState.userHand.hands.head.cardCodes should be (List(10, 12))
+    firstStandState.userHand.hands.last.cardCodes should be (List(11))
+    // Check statuses
+    firstStandState.userHand.hands.head.status should be (BlackjackHandStatus.STANDING)
+    firstStandState.userHand.hands.last.status should be (BlackjackHandStatus.OPEN)
+    // Check command
+    firstStandState.commandCode should be (commandService.blackjackStand.code)
+
+    // Hit once
+    blackjackService hit BlackjackHit(user.id, gameId)
+    val secondState = blackjackService stand BlackjackStand(user.id, gameId)
+    // Check that first hand is standing and has {10, 12}, while second hand is busted and has {11, 3, 9}
+    secondState.userHand.hands.head.cardCodes should be (List(10, 12))
+    secondState.userHand.hands.last.cardCodes should be (List(11, 3))
+    // Check statuses
+    secondState.userHand.hands.head.status should be (BlackjackHandStatus.STANDING)
+    secondState.userHand.hands.last.status should be (BlackjackHandStatus.STANDING)
+    // Check command
+    secondState.commandCode should be (commandService.blackjackStand.code)
+
+    // Dealer's hand should be completed
+    secondState.dealerHand.cardCodes should be (List(13, 6, 9))
+
+    // Check winners
+    secondState.userHand.hands.head.outcome should be (BlackjackHandOutcome.WON)
+    secondState.userHand.hands.last.outcome should be (BlackjackHandOutcome.WON)
+
+    // Check game state to be round finished
+    secondState.statusCode should be (statusService.blackjackRoundFinished.code)
+
+    // Check account balance
+    accountDao.findAccount(user.id).get.amount should be (BigDecimal(120.0))
   }
   it should "test if blackjack win works" in {
     val user = userService.registerUser(User(-1, "blackjackservicetest_userwinsafteronehit@gmail.com", "testpass123123", -1))
@@ -397,9 +460,14 @@ class BlackjackServiceTest extends DashUnitTest {
       List(1, 11, 10, 14, 2, 4, 3, 5, 6, 7, 8, 9, 12, 13) union (15 to 52).toList
     ), "serverseed", "clientseed", SIGNED, -1)).get
 
-def createNewDeckSplit = blackjackDeckDao.insertBlackjackDeck(BlackjackDeck(-1,
+  def createNewDeckSplit = blackjackDeckDao.insertBlackjackDeck(BlackjackDeck(-1,
     BlackjackDeckOrder(
-      List(10, 13, 11, 8, 12, 3, 9, 1, 2, 4, 5, 6, 7) union (14 to 52).toList
+      List(10, 13, 11, 8, 12, 3, 9, 1, 2, 4, 5, 6,  7) union (14 to 52).toList
+    ), "serverseed", "clientseed", SIGNED, -1)).get
+
+  def createNewDeckSplitWinWin = blackjackDeckDao.insertBlackjackDeck(BlackjackDeck(-1,
+    BlackjackDeckOrder(
+      List(10, 13, 11, 6, 12, 3, 9, 1, 2, 4, 5, 8, 7) union (14 to 52).toList
     ), "serverseed", "clientseed", SIGNED, -1)).get
 
   implicit class CardCodesEasyAccess(blackjackHand: BlackjackHand) {
