@@ -9,5 +9,5 @@ import scala.concurrent.duration._
   */
 package object dashcasino {
   implicit val timeout = Timeout(5.seconds)
-  implicit val actorSystem = ActorSystem("DashCasinoSystem")
+  implicit val actorSystem = ActorSystem("dash-casino-test-system")
 }
