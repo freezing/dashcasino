@@ -50,7 +50,7 @@ class BlackjackDeckService(implicit val blackjackDeckSqlDao: BlackjackDeckSqlDao
     BlackjackDeck(-1, marsenneOrder, serverSeed, clientSeed, SIGNED, -1)
   }
 
-  private def marsenneTwister(order: BlackjackDeckOrder, serverSeed: String, clientSeed: String): BlackjackDeckOrder = {
+  private def marsenneTwister(order: BlackjackDeckOrder, serverSeed: Long, clientSeed: String): BlackjackDeckOrder = {
     // TODO: Implement Marsenne Twister algorithm
     order
   }

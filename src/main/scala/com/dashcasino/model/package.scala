@@ -54,6 +54,7 @@ package object model {
   case class BlackjackHands(hands: List[BlackjackHand])
 
   // Implicit JSON codec for Argonaut
+  implicit def UserCodecJson = casecodec4(User.apply, User.unapply)("id", "email", "passwordHash", "timestamp")
   implicit def BlackjackDeckOrderCodecJson = casecodec1(BlackjackDeckOrder.apply, BlackjackDeckOrder.unapply)("cards")
   implicit def BlackjackCardCodecJson = casecodec10(BlackjackCard.apply, BlackjackCard.unapply)("id", "code", "rankCode", "rankName", "rankLetter", "suitName", "suitLetter", "suitCode", "primaryValue", "secondaryValue")
   implicit def BlackjackHandCodecJson = casecodec5(BlackjackHand.apply, BlackjackHand.unapply)("cards", "status", "outcome", "money", "paymentFinished")
