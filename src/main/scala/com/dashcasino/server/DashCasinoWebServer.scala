@@ -70,5 +70,5 @@ object DashCasinoWebServer extends App with ImplicitDefinitions {
   val service = actorSystem.actorOf(Props(new HttpApiServiceActor), "web-server-actor")
 
   // Start a new HTTP server
-  IO(Http) ? Http.Bind(service, interface = InetAddress.getLocalHost.getHostName, port = p)
+  IO(Http) ? Http.Bind(service, interface = "localhost", port = p)
 }

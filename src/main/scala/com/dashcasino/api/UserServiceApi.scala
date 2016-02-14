@@ -10,14 +10,15 @@ import Argonaut._
   */
 trait UserServiceApi extends ServiceApi { self: HttpApiServiceActor =>
   val USER_API_PATH = API_VERSION_PATH.resolve("user")
-  val userRoutes = {
-    registerPath
+  // TODO: Figure out nice way to use path
+  val registerPath =
+    pathPrefix("api") { pathPrefix("v1") { pathPrefix("user") {
+      path("register") {
+      parameters('email, 'password) {
+        case (email, password) => respondWithMediaType(`application/json`) { complete {
+          userService.registerUser(User(-1, email, password, -1)).asJson
+        } } } } } }
   }
 
-  val registerPath = path(USER_API_PATH.resolve("register").toString) {
-    parameters('email, 'password) {
-      case (email, password) => respondWithMediaType(`application/json`) { complete {
-        userService.registerUser(User(-1, email, password, -1)).asJson
-      } } }
-  }
+  val userRoutes = registerPath
 }
