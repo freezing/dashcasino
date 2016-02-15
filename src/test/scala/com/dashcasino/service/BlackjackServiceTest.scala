@@ -443,32 +443,32 @@ class BlackjackServiceTest extends DashUnitTest {
     }
   }
 
-  def createNewDeck = blackjackDeckDao.insertBlackjackDeck(BlackjackDeck(-1, BlackjackDeckOrder((1 to 52).toList), 123456789012334L, "clientseed", "", "", SIGNED, -1)).get
+  def createNewDeck = blackjackDeckDao.insertBlackjackDeck(BlackjackDeck(-1, BlackjackDeckOrder((1 to 52).toList), "LKH*&@AADLN#!#912u3ehjknasd", "clientseed", "", "", SIGNED, -1)).get
 
   def createNewDeckUserWins = blackjackDeckDao.insertBlackjackDeck(BlackjackDeck(-1,
     BlackjackDeckOrder(
       List(1, 4, 8, 3, 2, 5, 6, 7) union (9 to 52).toList
-    ), 123456789012334L, "clientseed", "", "", SIGNED, -1)).get
+    ), "LKH*&@AADLN#!#912u3ehjknasd", "clientseed", "", "", SIGNED, -1)).get
 
   def createNewDeckUserWinsBlackjack = blackjackDeckDao.insertBlackjackDeck(BlackjackDeck(-1,
     BlackjackDeckOrder(
       List(1, 2, 10, 4, 3, 5, 6, 7, 8, 9) union (11 to 52).toList
-    ), 123456789012334L, "clientseed", "", "", SIGNED, -1)).get
+    ), "LKH*&@AADLN#!#912u3ehjknasd", "clientseed", "", "", SIGNED, -1)).get
 
   def createNewDeckBothBlackjacks = blackjackDeckDao.insertBlackjackDeck(BlackjackDeck(-1,
     BlackjackDeckOrder(
       List(1, 11, 10, 14, 2, 4, 3, 5, 6, 7, 8, 9, 12, 13) union (15 to 52).toList
-    ), 123456789012334L, "clientseed", "", "", SIGNED, -1)).get
+    ), "LKH*&@AADLN#!#912u3ehjknasd", "clientseed", "", "", SIGNED, -1)).get
 
   def createNewDeckSplit = blackjackDeckDao.insertBlackjackDeck(BlackjackDeck(-1,
     BlackjackDeckOrder(
       List(10, 13, 11, 8, 12, 3, 9, 1, 2, 4, 5, 6,  7) union (14 to 52).toList
-    ), 123456789012334L, "clientseed", "", "", SIGNED, -1)).get
+    ), "LKH*&@AADLN#!#912u3ehjknasd", "clientseed", "", "", SIGNED, -1)).get
 
   def createNewDeckSplitWinWin = blackjackDeckDao.insertBlackjackDeck(BlackjackDeck(-1,
     BlackjackDeckOrder(
       List(10, 13, 11, 6, 12, 3, 9, 1, 2, 4, 5, 8, 7) union (14 to 52).toList
-    ), 123456789012334L, "clientseed", "", "", SIGNED, -1)).get
+    ), "LKH*&@AADLN#!#912u3ehjknasd", "clientseed", "", "", SIGNED, -1)).get
 
   implicit class CardCodesEasyAccess(blackjackHand: BlackjackHand) {
     def cardCodes = blackjackHand.cards map { c => c.code }

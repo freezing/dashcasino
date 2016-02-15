@@ -18,7 +18,7 @@ class BlackjackDeckService(implicit val blackjackDeckSqlDao: BlackjackDeckSqlDao
   val NOT_SIGNED = false
   val SIGNED = true
 
-  def generateServerSeed = UUID.randomUUID().getLeastSignificantBits
+  def generateServerSeed = UUID.randomUUID().toString
 
   def newDeck: BlackjackDeck = {
     val serverSeed = generateServerSeed
@@ -38,7 +38,7 @@ class BlackjackDeckService(implicit val blackjackDeckSqlDao: BlackjackDeckSqlDao
     blackjackDeckSqlDao.insertBlackjackDeck(signedDeck).get
   }
 
-  def initialShuffle(serverSeed: Long): BlackjackDeckOrder = BlackjackDeckOrder(fisherYatesShuffle(1 to 52, serverSeed))
+  def initialShuffle(serverSeed: String): BlackjackDeckOrder = BlackjackDeckOrder(fisherYatesShuffle(1 to 52, serverSeed))
 
   def signDeck(unsignedDeck: BlackjackDeck, clientSeed: String): BlackjackDeck = {
     val signedDeck = createSignedDeck(unsignedDeck, clientSeed)
@@ -63,8 +63,8 @@ class BlackjackDeckService(implicit val blackjackDeckSqlDao: BlackjackDeckSqlDao
     MessageDigest.getInstance("SHA-1").digest(seed.getBytes("utf-8")).toString
   }
 
-  def fisherYatesShuffle(a: List[Int], seed: Long): List[Int] = {
-    val rnd = new Random(seed)
+  def fisherYatesShuffle(a: List[Int], seed: String): List[Int] = {
+    val rnd = new Random()
     val array = a.toArray
     for (i <- array.indices.reverse diff Range(0, 1)) {
       // Swap them
@@ -76,5 +76,5 @@ class BlackjackDeckService(implicit val blackjackDeckSqlDao: BlackjackDeckSqlDao
     array.toList
   }
 
-  def fisherYatesShuffle(a: Seq[Int], seed: Long): List[Int] = fisherYatesShuffle(a.toList, seed)
+  def fisherYatesShuffle(a: Seq[Int], seed: String): List[Int] = fisherYatesShuffle(a.toList, seed)
 }
