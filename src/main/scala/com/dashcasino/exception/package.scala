@@ -13,7 +13,7 @@ package object exception {
   class CantStandException extends Exception("Can't stand in this state")
   class IllegalRequestException(message: String) extends Exception(message)
   class NotEnoughMoneyException(message: String) extends Exception(message)
-  class InvalidServerSeedException extends Exception
+  class InvalidServerSecretException extends Exception
   class CantDoubleDownException extends Exception("Can't doubledown in this state")
   class CantSplitException extends Exception("Can't split in this state")
 }
